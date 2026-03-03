@@ -1,694 +1,545 @@
-// =============================================
-// HEDING 커리어 컨설팅 랜딩페이지 - JavaScript
-// =============================================
+/* ===========================================
+   HEDING - script.js
+   Google Forms 자동채움 완전판
+   =========================================== */
 
-// =============================================
-// Headhunter Data (더미 데이터)
-// =============================================
-const headhunters = [
-    {
-        id: 1,
-        name: "김민준",
-        photo: "https://i.pravatar.cc/150?img=12",
-        tags: ["IT/Tech", "스타트업", "Growth"],
-        bio: "네이버, 카카오 등 IT 대기업과 유니콘 스타트업에서 10년간 개발자·PM 채용을 담당했습니다. 테크 인재의 커리어 성장 전략에 특화되어 있습니다."
+// ============================================================
+// 상수: Google Forms entry 매핑
+// ============================================================
+const FORMS = {
+    consulting: {
+        base: "https://docs.google.com/forms/d/e/1FAIpQLSf9VmfNZYUPLCfpEouPJSrYeEC0tUFt9MIgZsifzG91V-PNNQ/viewform",
+        entry: {
+            name: "entry.557460685",
+            email: "entry.1639629100",
+            phone: "entry.448397914",
+            services: "entry.1771650009",  // append 복수
+            package: "entry.1607120638",
+            hunterPref: "entry.1363268145",
+            consent: "entry.681351882"
+        }
     },
-    {
-        id: 2,
-        name: "이서연",
-        photo: "https://i.pravatar.cc/150?img=5",
-        tags: ["금융", "컨설팅", "전략"],
-        bio: "골드만삭스, 맥킨지 등 글로벌 금융·컨설팅 업계 경력자 전문 헤드헌터입니다. MBA 출신 대상 커리어 전환 코칭 경험이 풍부합니다."
-    },
-    {
-        id: 3,
-        name: "박준호",
-        photo: "https://i.pravatar.cc/150?img=33",
-        tags: ["제조", "엔지니어링", "R&D"],
-        bio: "삼성전자, LG, 현대차 등 제조업 R&D 조직 채용 전문가입니다. 엔지니어 출신으로 기술 인재의 커리어 고민을 깊이 이해합니다."
-    },
-    {
-        id: 4,
-        name: "최지우",
-        photo: "https://i.pravatar.cc/150?img=9",
-        tags: ["마케팅", "브랜딩", "커머스"],
-        bio: "쿠팡, 무신사, 29CM 등 이커머스 업계에서 마케팅·브랜딩 직군 채용 8년 경력. 디지털 마케터의 커리어 전략 수립을 돕습니다."
-    },
-    {
-        id: 5,
-        name: "정태영",
-        photo: "https://i.pravatar.cc/150?img=52",
-        tags: ["세일즈", "비즈니스개발", "B2B"],
-        bio: "세일즈포스, 오라클 등 글로벌 SaaS 기업에서 B2B 세일즈 조직을 구축한 경험이 있습니다. 영업 직군의 연봉 협상 전문가입니다."
-    },
-    {
-        id: 6,
-        name: "한소희",
-        photo: "https://i.pravatar.cc/150?img=25",
-        tags: ["디자인", "UX/UI", "크리에이티브"],
-        bio: "당근마켓, 토스 등 프로덕트 중심 조직에서 디자이너 채용을 담당했습니다. 포트폴리오 리뷰와 디자인 커리어 성장 조언이 강점입니다."
-    },
-    {
-        id: 7,
-        name: "오성민",
-        photo: "https://i.pravatar.cc/150?img=68",
-        tags: ["HR", "조직문화", "People"],
-        bio: "배달의민족, 직방 등에서 People 팀을 이끌었습니다. HR 직군으로의 전환과 조직문화 전문가 양성에 관심이 많습니다."
+    coaching: {
+        base: "https://docs.google.com/forms/d/e/1FAIpQLSc4GzEGUwmRIeGGV6ge6sZuLuimJUPJMkAgXquQNNX2olkNKg/viewform",
+        entry: {
+            name: "entry.555508049",
+            email: "entry.1338187755",
+            phone: "entry.1191583357",
+            role: "entry.1274577325",
+            industry: "entry.1360035338",
+            years: "entry.320562509",
+            topics: "entry.1504440615",  // append 복수
+            availability: "entry.478213786",   // append 복수
+            type: "entry.1947487813"
+        }
     }
-];
-
-// =============================================
-// Global State
-// =============================================
-const state = {
-    selectedHeadhunters: {
-        first: null,
-        second: null,
-        third: null
-    },
-    noPreference: false
 };
 
-// =============================================
-// Initialize App
-// =============================================
-document.addEventListener('DOMContentLoaded', () => {
-    initAccordions();
-    renderHeadhunters();
-    initHeadhunterSelection();
-    initCustomerForm();
-    initCoachForm();
+// ============================================================
+// URL 생성
+// ============================================================
+function buildUrl(base, single, multi) {
+    const params = new URLSearchParams();
+    params.set("usp", "pp_url");
+
+    // 단일 값
+    Object.entries(single || {}).forEach(([k, v]) => {
+        const s = String(v ?? "").trim();
+        if (s) params.set(k, s);
+    });
+
+    // 복수(체크박스) - append
+    Object.entries(multi || {}).forEach(([k, arr]) => {
+        if (!Array.isArray(arr)) return;
+        arr.forEach(v => {
+            const s = String(v ?? "").trim();
+            if (s) params.append(k, s);
+        });
+    });
+
+    return `${base}?${params.toString()}`;
+}
+
+// ============================================================
+// 헤드헌터 선호 텍스트 생성
+// ============================================================
+function hunterPrefText() {
+    if (hunterState.none) return "무관";
+    const n = h => h ? hunterState.names[h] || h : "없음";
+    const p1 = `1지망:${n(hunterState.rank1)}`;
+    const p2 = `2지망:${n(hunterState.rank2)}`;
+    const p3 = `3지망:${n(hunterState.rank3)}`;
+    return `${p1} / ${p2} / ${p3}`;
+}
+
+// ============================================================
+// 컨설팅 폼 열기
+// ============================================================
+function openConsulting(state) {
+    const e = FORMS.consulting.entry;
+    const single = {};
+    single[e.name] = state.name;
+    single[e.email] = state.email || "";
+    single[e.phone] = state.phone || "";
+    single[e.package] = state.package || "";
+    single[e.hunterPref] = hunterPrefText();
+    single[e.consent] = state.consent ? "동의합니다" : "";
+
+    const multi = {};
+    multi[e.services] = state.services || [];
+
+    const url = buildUrl(FORMS.consulting.base, single, multi);
+    window.open(url, "_blank", "noopener,noreferrer");
+}
+
+// ============================================================
+// 코칭 폼 열기
+// ============================================================
+function openCoaching(state) {
+    const e = FORMS.coaching.entry;
+    const single = {};
+    single[e.name] = state.name;
+    single[e.email] = state.email;
+    single[e.phone] = state.phone || "";
+    single[e.role] = state.role;
+    single[e.industry] = state.industry;
+    single[e.years] = state.years;
+    single[e.type] = state.type;
+
+    const multi = {};
+    multi[e.topics] = state.topics || [];
+    multi[e.availability] = state.availability || [];
+
+    const url = buildUrl(FORMS.coaching.base, single, multi);
+    window.open(url, "_blank", "noopener,noreferrer");
+}
+
+// ============================================================
+// 헤드헌터 전역 상태
+// ============================================================
+const hunterState = {
+    none: false,
+    rank1: null, rank2: null, rank3: null,
+    names: {}  // id -> name
+};
+
+// ============================================================
+// 헤드헌터 렌더링 (JSON fetch)
+// ============================================================
+async function loadHeadhunters() {
+    const container = document.getElementById("headhunter-list");
+    try {
+        const res = await fetch("./heding-headhunters.json");
+        if (!res.ok) throw new Error("fetch error");
+        const hunters = await res.json();
+
+        container.innerHTML = "";
+        hunters.forEach(hh => {
+            hunterState.names[hh.id] = hh.name;
+            const card = createHunterCard(hh);
+            container.appendChild(card);
+        });
+    } catch (err) {
+        container.innerHTML = `<div class="hunter-loading">헤드헌터 정보를 불러올 수 없습니다. (${err.message})</div>`;
+    }
+}
+
+function createHunterCard(hh) {
+    const card = document.createElement("div");
+    card.className = "hunter-card";
+    card.dataset.id = hh.id;
+
+    // 아바타 이니셜
+    const initial = hh.name ? hh.name[0] : "?";
+
+    card.innerHTML = `
+    <div class="hunter-avatar">${initial}</div>
+    <div class="hunter-name">${hh.name}</div>
+    <div class="hunter-tags">
+      ${(hh.tags || []).map(t => `<span class="hunter-tag">${t}</span>`).join("")}
+    </div>
+    <div class="hunter-bio">${hh.bio}</div>
+    <div class="hunter-btn-wrap">
+      <button class="btn-hunter" data-id="${hh.id}" onclick="handleHunterClick(${hh.id}, this)">
+        선택하기
+      </button>
+    </div>
+  `;
+    return card;
+}
+
+function handleHunterClick(id, btn) {
+    // 무관 상태면 초기화 후 진행
+    if (hunterState.none) {
+        hunterState.none = false;
+        document.getElementById("btn-no-preference").classList.remove("active");
+    }
+
+    // 이미 선택된 지망인지 확인 → 취소
+    if (hunterState.rank1 === id) {
+        hunterState.rank1 = null;
+    } else if (hunterState.rank2 === id) {
+        hunterState.rank2 = null;
+    } else if (hunterState.rank3 === id) {
+        hunterState.rank3 = null;
+    } else {
+        // 빈 슬롯에 배정
+        if (!hunterState.rank1) hunterState.rank1 = id;
+        else if (!hunterState.rank2) hunterState.rank2 = id;
+        else if (!hunterState.rank3) hunterState.rank3 = id;
+        else {
+            // 3지망까지 꽉 참 → 알림
+            alert("이미 1~3지망이 모두 선택되었습니다.\n기존 선택을 취소하려면 해당 버튼을 다시 클릭하세요.");
+            return;
+        }
+    }
+
+    refreshHunterUI();
+}
+
+function toggleNoPreference() {
+    hunterState.none = !hunterState.none;
+    if (hunterState.none) {
+        hunterState.rank1 = null;
+        hunterState.rank2 = null;
+        hunterState.rank3 = null;
+    }
+    refreshHunterUI();
+}
+
+function refreshHunterUI() {
+    const noBtn = document.getElementById("btn-no-preference");
+    noBtn.classList.toggle("active", hunterState.none);
+    noBtn.textContent = hunterState.none ? "✓ 무관 선택됨" : "헤드헌터 무관";
+
+    // 모든 카드 업데이트
+    document.querySelectorAll(".hunter-card").forEach(card => {
+        const id = parseInt(card.dataset.id);
+        const btn = card.querySelector(".btn-hunter");
+        card.classList.remove("selected-1", "selected-2", "selected-3");
+        btn.classList.remove("rank-1", "rank-2", "rank-3");
+
+        if (hunterState.none) {
+            btn.disabled = true;
+            btn.textContent = "선택하기";
+            return;
+        }
+        btn.disabled = false;
+
+        if (hunterState.rank1 === id) {
+            card.classList.add("selected-1");
+            btn.classList.add("rank-1");
+            btn.textContent = "1지망 ✓";
+        } else if (hunterState.rank2 === id) {
+            card.classList.add("selected-2");
+            btn.classList.add("rank-2");
+            btn.textContent = "2지망 ✓";
+        } else if (hunterState.rank3 === id) {
+            card.classList.add("selected-3");
+            btn.classList.add("rank-3");
+            btn.textContent = "3지망 ✓";
+        } else {
+            btn.textContent = "선택하기";
+        }
+    });
+
+    // 요약 표시
+    const summary = document.getElementById("hunter-summary");
+    const summaryText = document.getElementById("hunter-summary-text");
+    const hasSelection = hunterState.none || hunterState.rank1 || hunterState.rank2 || hunterState.rank3;
+
+    if (hasSelection) {
+        summary.classList.remove("hidden");
+        summaryText.textContent = hunterPrefText();
+    } else {
+        summary.classList.add("hidden");
+    }
+
+    // 모달 내 헤드헌터 표시 업데이트
+    const display = document.getElementById("c-hunter-display");
+    if (display) display.value = hunterPrefText();
+}
+
+// ============================================================
+// 모달 열기/닫기
+// ============================================================
+function openConsultingModal(preService = null, prePackage = null) {
+    const modal = document.getElementById("modal-consulting");
+    modal.classList.add("active");
+    document.body.style.overflow = "hidden";
+
+    // 헤드헌터 선호 자동 반영
+    const hunterDisplay = document.getElementById("c-hunter-display");
+    if (hunterDisplay) hunterDisplay.value = hunterPrefText();
+
+    // 서비스 미리 선택
+    if (preService) {
+        document.querySelectorAll("input[name='c-services']").forEach(cb => {
+            cb.checked = cb.value === preService;
+        });
+    }
+
+    // 패키지 미리 선택
+    if (prePackage) {
+        document.querySelectorAll("input[name='c-package']").forEach(r => {
+            r.checked = r.value === prePackage;
+        });
+        // 서비스 체크 해제
+        document.querySelectorAll("input[name='c-services']").forEach(cb => cb.checked = false);
+    }
+
+    updateConsultingSummary();
+}
+
+function openCoachingModal() {
+    const modal = document.getElementById("modal-coaching");
+    modal.classList.add("active");
+    document.body.style.overflow = "hidden";
+    updateCoachingSummary();
+}
+
+function closeModal(id) {
+    document.getElementById(id).classList.remove("active");
+    document.body.style.overflow = "";
+    clearErrors(id);
+}
+
+// ESC 키로 닫기
+document.addEventListener("keydown", e => {
+    if (e.key === "Escape") {
+        closeModal("modal-consulting");
+        closeModal("modal-coaching");
+    }
 });
 
-// =============================================
-// Accordion Functionality
-// =============================================
+// 오버레이 클릭 닫기
+document.querySelectorAll(".modal-overlay").forEach(overlay => {
+    overlay.addEventListener("click", e => {
+        if (e.target === overlay) {
+            closeModal(overlay.id);
+        }
+    });
+});
+
+// ============================================================
+// 컨설팅 검증 & 제출
+// ============================================================
+function getConsultingState() {
+    return {
+        name: document.getElementById("c-name").value.trim(),
+        email: document.getElementById("c-email").value.trim(),
+        phone: document.getElementById("c-phone").value.trim(),
+        services: Array.from(document.querySelectorAll("input[name='c-services']:checked")).map(c => c.value),
+        package: (document.querySelector("input[name='c-package']:checked") || {}).value || "",
+        consent: document.getElementById("c-consent").checked
+    };
+}
+
+function validateConsulting(state) {
+    let ok = true;
+    clearErrors("modal-consulting");
+
+    if (!state.name) {
+        showError("err-c-name", "이름을 입력해주세요.");
+        ok = false;
+    }
+    if (!state.email && !state.phone) {
+        showError("err-c-contact", "이메일 또는 휴대폰 중 하나를 입력해주세요.");
+        ok = false;
+    }
+    if (state.services.length === 0 && !state.package) {
+        showError("err-c-services", "서비스 또는 패키지를 최소 1개 선택해주세요.");
+        ok = false;
+    }
+    if (!state.consent) {
+        showError("err-c-consent", "개인정보 수집 및 이용에 동의해주세요.");
+        ok = false;
+    }
+    return ok;
+}
+
+function submitConsulting() {
+    const state = getConsultingState();
+    if (!validateConsulting(state)) return;
+    openConsulting(state);
+}
+
+// ============================================================
+// 코칭 검증 & 제출
+// ============================================================
+function getCoachingState() {
+    return {
+        name: document.getElementById("p-name").value.trim(),
+        email: document.getElementById("p-email").value.trim(),
+        phone: document.getElementById("p-phone").value.trim(),
+        role: document.getElementById("p-role").value.trim(),
+        industry: document.getElementById("p-industry").value.trim(),
+        years: document.getElementById("p-years").value.trim(),
+        topics: Array.from(document.querySelectorAll("input[name='p-topics']:checked")).map(c => c.value),
+        availability: Array.from(document.querySelectorAll("input[name='p-availability']:checked")).map(c => c.value),
+        type: (document.querySelector("input[name='p-type']:checked") || {}).value || ""
+    };
+}
+
+function validateCoaching(state) {
+    let ok = true;
+    clearErrors("modal-coaching");
+
+    if (!state.name) { showError("err-p-name", "이름을 입력해주세요."); ok = false; }
+    if (!state.email) { showError("err-p-email", "이메일을 입력해주세요."); ok = false; }
+    if (!state.role) { showError("err-p-role", "직무/분야를 입력해주세요."); ok = false; }
+    if (!state.industry) { showError("err-p-industry", "산업을 입력해주세요."); ok = false; }
+    if (!state.years) { showError("err-p-years", "경력 연차를 입력해주세요."); ok = false; }
+    if (state.topics.length === 0) { showError("err-p-topics", "코칭 주제를 최소 1개 선택해주세요."); ok = false; }
+    if (state.availability.length === 0) { showError("err-p-availability", "가능 시간대를 최소 1개 선택해주세요."); ok = false; }
+    if (!state.type) { showError("err-p-type", "코칭 형태를 선택해주세요."); ok = false; }
+    return ok;
+}
+
+function submitCoaching() {
+    const state = getCoachingState();
+    if (!validateCoaching(state)) return;
+    openCoaching(state);
+}
+
+// ============================================================
+// 요약 텍스트 업데이트
+// ============================================================
+function updateConsultingSummary() {
+    const state = getConsultingState();
+    const lines = [];
+    if (state.name) lines.push(`이름: ${state.name}`);
+    if (state.email) lines.push(`이메일: ${state.email}`);
+    if (state.phone) lines.push(`휴대폰: ${state.phone}`);
+    if (state.services.length) lines.push(`서비스: ${state.services.join(", ")}`);
+    if (state.package) lines.push(`패키지: ${state.package}`);
+    lines.push(`헤드헌터 선호: ${hunterPrefText()}`);
+    lines.push(`개인정보동의: ${state.consent ? "동의" : "미동의"}`);
+    const el = document.getElementById("c-summary");
+    if (el) el.value = lines.join("\n");
+}
+
+function updateCoachingSummary() {
+    const state = getCoachingState();
+    const lines = [];
+    if (state.name) lines.push(`이름: ${state.name}`);
+    if (state.email) lines.push(`이메일: ${state.email}`);
+    if (state.phone) lines.push(`휴대폰: ${state.phone}`);
+    if (state.role) lines.push(`직무: ${state.role}`);
+    if (state.industry) lines.push(`산업: ${state.industry}`);
+    if (state.years) lines.push(`연차: ${state.years}`);
+    if (state.topics.length) lines.push(`코칭주제: ${state.topics.join(", ")}`);
+    if (state.availability.length) lines.push(`가능시간: ${state.availability.join(", ")}`);
+    if (state.type) lines.push(`코칭형태: ${state.type}`);
+    const el = document.getElementById("p-summary");
+    if (el) el.value = lines.join("\n");
+}
+
+// ============================================================
+// 요약 복사
+// ============================================================
+async function copySummary(textareaId) {
+    const ta = document.getElementById(textareaId);
+    if (!ta || !ta.value) return;
+    try {
+        await navigator.clipboard.writeText(ta.value);
+        showCopyFeedback(ta);
+    } catch {
+        ta.select();
+        ta.setSelectionRange(0, 99999);
+        try { document.execCommand("copy"); showCopyFeedback(ta); }
+        catch { alert("자동 복사에 실패했습니다. 텍스트를 직접 선택하여 복사해주세요."); }
+    }
+}
+
+function showCopyFeedback(ta) {
+    const btn = ta.closest(".summary-box").querySelector(".btn-secondary");
+    if (!btn) return;
+    const original = btn.textContent;
+    btn.textContent = "✓ 복사됨";
+    btn.disabled = true;
+    setTimeout(() => { btn.textContent = original; btn.disabled = false; }, 2000);
+}
+
+// ============================================================
+// 에러 표시/초기화
+// ============================================================
+function showError(id, msg) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = msg;
+}
+
+function clearErrors(modalId) {
+    document.getElementById(modalId).querySelectorAll(".form-error").forEach(el => el.textContent = "");
+}
+
+// ============================================================
+// 아코디언
+// ============================================================
 function initAccordions() {
-    const accordionHeaders = document.querySelectorAll('.accordion-header');
+    document.querySelectorAll(".accordion-header").forEach(header => {
+        header.addEventListener("click", () => {
+            const item = header.closest(".accordion-item");
+            const content = item.querySelector(".accordion-content");
+            const isOpen = header.classList.contains("active");
 
-    accordionHeaders.forEach(header => {
-        header.addEventListener('click', () => {
-            const isActive = header.classList.contains('active');
-            const content = header.nextElementSibling;
+            // 같은 아코디언 내 다른 항목 닫기 (옵션: 주석 해제 시 동작)
+            // item.closest(".accordion").querySelectorAll(".accordion-item").forEach(i => {
+            //   i.querySelector(".accordion-header").classList.remove("active");
+            //   i.querySelector(".accordion-content").classList.remove("active");
+            // });
 
-            // Toggle active state
-            header.classList.toggle('active');
-            content.classList.toggle('active');
+            header.classList.toggle("active", !isOpen);
+            content.classList.toggle("active", !isOpen);
         });
     });
 }
 
-// =============================================
-// Headhunter Rendering
-// =============================================
-function renderHeadhunters() {
-    const container = document.getElementById('headhunter-list');
+// ============================================================
+// 실시간 요약 업데이트 (모달 내 입력 변경 시)
+// ============================================================
+function initLiveUpdates() {
+    const consultingModal = document.getElementById("modal-consulting");
+    const coachingModal = document.getElementById("modal-coaching");
 
-    headhunters.forEach(hh => {
-        const card = document.createElement('div');
-        card.className = 'card headhunter-card';
-        card.dataset.id = hh.id;
-
-        card.innerHTML = `
-      <img src="${hh.photo}" alt="${hh.name}" class="headhunter-photo">
-      <h4 class="headhunter-name">${hh.name}</h4>
-      <div class="headhunter-tags">
-        ${hh.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
-      </div>
-      <p class="headhunter-bio">${hh.bio}</p>
-      <button class="btn btn-select" data-hh-id="${hh.id}">1지망 선택</button>
-    `;
-
-        container.appendChild(card);
-    });
-}
-
-// =============================================
-// Headhunter Selection Logic
-// =============================================
-function initHeadhunterSelection() {
-    const container = document.getElementById('headhunter-list');
-    const noPreferenceBtn = document.getElementById('btn-no-preference');
-    const summaryDiv = document.getElementById('selection-summary');
-    const summaryText = document.getElementById('summary-text');
-
-    // Handle headhunter selection
-    container.addEventListener('click', (e) => {
-        if (e.target.classList.contains('btn-select')) {
-            const hhId = parseInt(e.target.dataset.hhId);
-            handleHeadhunterClick(hhId);
-            updateUI();
-            updateSummary();
-        }
-    });
-
-    // Handle "no preference" button
-    noPreferenceBtn.addEventListener('click', () => {
-        state.noPreference = !state.noPreference;
-
-        if (state.noPreference) {
-            // Clear all selections
-            state.selectedHeadhunters.first = null;
-            state.selectedHeadhunters.second = null;
-            state.selectedHeadhunters.third = null;
-            noPreferenceBtn.classList.add('btn-primary');
-            noPreferenceBtn.classList.remove('btn-secondary');
-            noPreferenceBtn.textContent = '무관 선택됨 (취소하려면 클릭)';
-        } else {
-            noPreferenceBtn.classList.remove('btn-primary');
-            noPreferenceBtn.classList.add('btn-secondary');
-            noPreferenceBtn.textContent = '헤드헌터 무관';
-        }
-
-        updateUI();
-        updateSummary();
-    });
-
-    function handleHeadhunterClick(hhId) {
-        // If no preference is selected, clear it first
-        if (state.noPreference) {
-            state.noPreference = false;
-            noPreferenceBtn.classList.remove('btn-primary');
-            noPreferenceBtn.classList.add('btn-secondary');
-            noPreferenceBtn.textContent = '헤드헌터 무관';
-        }
-
-        // Check if already selected
-        if (state.selectedHeadhunters.first === hhId) {
-            state.selectedHeadhunters.first = null;
-        } else if (state.selectedHeadhunters.second === hhId) {
-            state.selectedHeadhunters.second = null;
-        } else if (state.selectedHeadhunters.third === hhId) {
-            state.selectedHeadhunters.third = null;
-        } else {
-            // Add to next available slot
-            if (state.selectedHeadhunters.first === null) {
-                state.selectedHeadhunters.first = hhId;
-            } else if (state.selectedHeadhunters.second === null) {
-                state.selectedHeadhunters.second = hhId;
-            } else if (state.selectedHeadhunters.third === null) {
-                state.selectedHeadhunters.third = hhId;
-            } else {
-                // All slots filled, replace third
-                state.selectedHeadhunters.third = hhId;
-            }
-        }
-    }
-
-    function updateUI() {
-        const buttons = container.querySelectorAll('.btn-select');
-
-        buttons.forEach(btn => {
-            const hhId = parseInt(btn.dataset.hhId);
-
-            // Reset classes
-            btn.classList.remove('selected-1', 'selected-2', 'selected-3');
-
-            if (state.noPreference) {
-                btn.disabled = true;
-                btn.textContent = '1지망 선택';
-            } else {
-                btn.disabled = false;
-
-                if (state.selectedHeadhunters.first === hhId) {
-                    btn.classList.add('selected-1');
-                    btn.textContent = '1지망 선택됨';
-                } else if (state.selectedHeadhunters.second === hhId) {
-                    btn.classList.add('selected-2');
-                    btn.textContent = '2지망 선택됨';
-                } else if (state.selectedHeadhunters.third === hhId) {
-                    btn.classList.add('selected-3');
-                    btn.textContent = '3지망 선택됨';
-                } else {
-                    btn.textContent = '선택하기';
-
-                    // Disable if all slots are filled
-                    const allFilled = state.selectedHeadhunters.first !== null &&
-                        state.selectedHeadhunters.second !== null &&
-                        state.selectedHeadhunters.third !== null;
-                    btn.disabled = allFilled;
-                }
-            }
+    if (consultingModal) {
+        consultingModal.addEventListener("change", () => {
+            updateConsultingSummary();
+            // 헤드헌터 선호도 갱신
+            const display = document.getElementById("c-hunter-display");
+            if (display) display.value = hunterPrefText();
         });
+        consultingModal.addEventListener("input", updateConsultingSummary);
     }
-
-    function updateSummary() {
-        const hasSelection = state.noPreference ||
-            state.selectedHeadhunters.first !== null ||
-            state.selectedHeadhunters.second !== null ||
-            state.selectedHeadhunters.third !== null;
-
-        if (!hasSelection) {
-            summaryDiv.style.display = 'none';
-            return;
-        }
-
-        summaryDiv.style.display = 'block';
-
-        if (state.noPreference) {
-            summaryText.innerHTML = '<strong>헤드헌터 무관</strong> - 가장 적합한 헤드헌터를 자동으로 매칭해드립니다.';
-            return;
-        }
-
-        const lines = [];
-
-        if (state.selectedHeadhunters.first !== null) {
-            const hh = headhunters.find(h => h.id === state.selectedHeadhunters.first);
-            lines.push(`<strong>1지망:</strong> ${hh.name}`);
-        }
-
-        if (state.selectedHeadhunters.second !== null) {
-            const hh = headhunters.find(h => h.id === state.selectedHeadhunters.second);
-            lines.push(`<strong>2지망:</strong> ${hh.name}`);
-        }
-
-        if (state.selectedHeadhunters.third !== null) {
-            const hh = headhunters.find(h => h.id === state.selectedHeadhunters.third);
-            lines.push(`<strong>3지망:</strong> ${hh.name}`);
-        }
-
-        summaryText.innerHTML = lines.join('<br>');
+    if (coachingModal) {
+        coachingModal.addEventListener("change", updateCoachingSummary);
+        coachingModal.addEventListener("input", updateCoachingSummary);
     }
 }
 
-// =============================================
-// Customer Form Validation & Submission
-// =============================================
-function initCustomerForm() {
-    const form = document.getElementById('customer-form');
-    const resultDiv = document.getElementById('customer-form-result');
-
-    form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-
-        // Clear previous errors
-        clearErrors();
-
-        // Validate form
-        const isValid = validateCustomerForm();
-
-        if (!isValid) {
-            return;
-        }
-
-        // Collect form data
-        const formData = collectCustomerFormData();
-
-        // Show loading state
-        const submitBtn = form.querySelector('button[type="submit"]');
-        const originalText = submitBtn.textContent;
-        submitBtn.disabled = true;
-        submitBtn.textContent = '제출 중...';
-
-        try {
-            // Submit to backend (Google Sheets Apps Script)
-            // Replace with your actual Apps Script URL
-            const scriptUrl = 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE';
-
-            // For demo purposes, simulate a successful submission
-            await simulateSubmission(formData);
-
-            // Show success message
-            showResult(resultDiv, 'success', `
-        <h3>신청이 완료되었습니다! 🎉</h3>
-        <p>24~48시간 내에 헤드헌터 매칭 결과를 이메일 또는 휴대폰으로 안내드립니다.</p>
-        <p>매칭 확정 후 계좌번호와 입금 금액을 별도로 안내해드립니다.</p>
-        <p><strong>문의:</strong> contact@heding.co.kr</p>
-      `);
-
-            // Reset form
-            form.reset();
-            state.selectedHeadhunters.first = null;
-            state.selectedHeadhunters.second = null;
-            state.selectedHeadhunters.third = null;
-            state.noPreference = false;
-
-            // Scroll to result
-            resultDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
-
-        } catch (error) {
-            showResult(resultDiv, 'error', `
-        <h3>제출 실패</h3>
-        <p>죄송합니다. 일시적인 오류가 발생했습니다.</p>
-        <p>잠시 후 다시 시도해주시거나 contact@heding.co.kr로 문의해주세요.</p>
-      `);
-        } finally {
-            submitBtn.disabled = false;
-            submitBtn.textContent = originalText;
-        }
+// ============================================================
+// 앵커 스무스 스크롤 (헤더 높이 보정)
+// ============================================================
+function initSmoothScroll() {
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", e => {
+            const href = anchor.getAttribute("href");
+            if (!href || href === "#") return;
+            const target = document.querySelector(href);
+            if (!target) return;
+            e.preventDefault();
+            const top = target.getBoundingClientRect().top + window.scrollY - 70;
+            window.scrollTo({ top, behavior: "smooth" });
+        });
     });
 }
 
-function validateCustomerForm() {
-    let isValid = true;
-
-    // Name
-    const name = document.getElementById('name').value.trim();
-    if (!name) {
-        showError('name', '이름을 입력해주세요.');
-        isValid = false;
-    }
-
-    // Email or Phone (at least one)
-    const email = document.getElementById('email').value.trim();
-    const phone = document.getElementById('phone').value.trim();
-    if (!email && !phone) {
-        showError('email', '이메일 또는 휴대폰 중 하나는 필수입니다.');
-        showError('phone', '이메일 또는 휴대폰 중 하나는 필수입니다.');
-        isValid = false;
-    }
-
-    // Services or Package
-    const services = Array.from(document.querySelectorAll('input[name="services"]:checked'));
-    const packageSelected = document.querySelector('input[name="package"]:checked');
-    if (services.length === 0 && !packageSelected) {
-        showError('services', '서비스 또는 패키지를 선택해주세요.');
-        isValid = false;
-    }
-
-    // Current role
-    const currentRole = document.getElementById('current-role').value.trim();
-    if (!currentRole) {
-        showError('current-role', '현재 직무 및 연차를 입력해주세요.');
-        isValid = false;
-    }
-
-    // Goals
-    const goals = Array.from(document.querySelectorAll('input[name="goals"]:checked'));
-    if (goals.length === 0) {
-        showError('goals', '최소 1개 이상의 목표를 선택해주세요.');
-        isValid = false;
-    }
-
-    // Headhunter preference (required)
-    const hasHeadhunterSelection = state.noPreference ||
-        state.selectedHeadhunters.first !== null ||
-        state.selectedHeadhunters.second !== null ||
-        state.selectedHeadhunters.third !== null;
-
-    if (!hasHeadhunterSelection) {
-        alert('헤드헌터 선택 섹션에서 1~3지망을 선택하시거나 "무관" 버튼을 클릭해주세요.');
-        isValid = false;
-    }
-
-    // Privacy agreement
-    const privacyAgree = document.getElementById('privacy-agree').checked;
-    if (!privacyAgree) {
-        showError('privacy', '개인정보 수집 및 이용에 동의해주세요.');
-        isValid = false;
-    }
-
-    return isValid;
-}
-
-function collectCustomerFormData() {
-    const services = Array.from(document.querySelectorAll('input[name="services"]:checked'))
-        .map(cb => cb.value);
-    const packageSelected = document.querySelector('input[name="package"]:checked');
-    const goals = Array.from(document.querySelectorAll('input[name="goals"]:checked'))
-        .map(cb => cb.value);
-
-    // Get headhunter preferences
-    let headhunterPreference = '';
-    if (state.noPreference) {
-        headhunterPreference = '무관';
-    } else {
-        const prefs = [];
-        if (state.selectedHeadhunters.first) {
-            const hh = headhunters.find(h => h.id === state.selectedHeadhunters.first);
-            prefs.push(`1지망: ${hh.name}`);
-        }
-        if (state.selectedHeadhunters.second) {
-            const hh = headhunters.find(h => h.id === state.selectedHeadhunters.second);
-            prefs.push(`2지망: ${hh.name}`);
-        }
-        if (state.selectedHeadhunters.third) {
-            const hh = headhunters.find(h => h.id === state.selectedHeadhunters.third);
-            prefs.push(`3지망: ${hh.name}`);
-        }
-        headhunterPreference = prefs.join(', ');
-    }
-
-    return {
-        type: 'customer',
-        name: document.getElementById('name').value.trim(),
-        email: document.getElementById('email').value.trim(),
-        phone: document.getElementById('phone').value.trim(),
-        services: services.join(', '),
-        package: packageSelected ? packageSelected.value : '',
-        currentRole: document.getElementById('current-role').value.trim(),
-        goals: goals.join(', '),
-        headhunterPreference: headhunterPreference,
-        resumeLink: document.getElementById('resume-link').value.trim(),
-        preferredTime: document.getElementById('preferred-time').value,
-        memo: document.getElementById('memo').value.trim(),
-        timestamp: new Date().toISOString(),
-        // UTM parameters (if available)
-        utm: collectUTMParams()
-    };
-}
-
-// =============================================
-// Coach Form Validation & Submission
-// =============================================
-function initCoachForm() {
-    const form = document.getElementById('coach-form');
-    const resultDiv = document.getElementById('coach-form-result');
-
-    form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-
-        // Clear previous errors
-        clearCoachErrors();
-
-        // Validate form
-        const isValid = validateCoachForm();
-
-        if (!isValid) {
-            return;
-        }
-
-        // Collect form data
-        const formData = collectCoachFormData();
-
-        // Show loading state
-        const submitBtn = form.querySelector('button[type="submit"]');
-        const originalText = submitBtn.textContent;
-        submitBtn.disabled = true;
-        submitBtn.textContent = '제출 중...';
-
-        try {
-            // Submit to backend
-            await simulateSubmission(formData);
-
-            // Show success message
-            showResult(resultDiv, 'success', `
-        <h3>지원이 완료되었습니다! 🎉</h3>
-        <p>제출하신 정보를 검토한 후 영업일 기준 3일 이내에 연락드리겠습니다.</p>
-        <p>HEDING 코치로 함께해주셔서 감사합니다!</p>
-        <p><strong>문의:</strong> contact@heding.co.kr</p>
-      `);
-
-            // Reset form
-            form.reset();
-
-            // Scroll to result
-            resultDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
-
-        } catch (error) {
-            showResult(resultDiv, 'error', `
-        <h3>제출 실패</h3>
-        <p>죄송합니다. 일시적인 오류가 발생했습니다.</p>
-        <p>잠시 후 다시 시도해주시거나 contact@heding.co.kr로 문의해주세요.</p>
-      `);
-        } finally {
-            submitBtn.disabled = false;
-            submitBtn.textContent = originalText;
-        }
-    });
-}
-
-function validateCoachForm() {
-    let isValid = true;
-
-    // Name
-    const name = document.getElementById('coach-name').value.trim();
-    if (!name) {
-        showCoachError('coach-name', '이름을 입력해주세요.');
-        isValid = false;
-    }
-
-    // Contact
-    const contact = document.getElementById('coach-contact').value.trim();
-    if (!contact) {
-        showCoachError('coach-contact', '연락처를 입력해주세요.');
-        isValid = false;
-    }
-
-    // Role
-    const role = document.getElementById('coach-role').value.trim();
-    if (!role) {
-        showCoachError('coach-role', '현직 직무 및 산업을 입력해주세요.');
-        isValid = false;
-    }
-
-    // Experience
-    const experience = document.getElementById('coach-experience').value;
-    if (!experience) {
-        showCoachError('coach-experience', '경력 연차를 선택해주세요.');
-        isValid = false;
-    }
-
-    // Expertise
-    const expertise = Array.from(document.querySelectorAll('input[name="expertise"]:checked'));
-    if (expertise.length === 0) {
-        showCoachError('expertise', '최소 1개 이상의 전문 분야를 선택해주세요.');
-        isValid = false;
-    }
-
-    // Availability
-    const availability = document.getElementById('coach-availability').value.trim();
-    if (!availability) {
-        showCoachError('coach-availability', '가능한 요일 및 시간대를 입력해주세요.');
-        isValid = false;
-    }
-
-    // Coaching type
-    const coachingType = document.querySelector('input[name="coaching-type"]:checked');
-    if (!coachingType) {
-        showCoachError('coaching-type', '코칭 형태를 선택해주세요.');
-        isValid = false;
-    }
-
-    // Privacy agreement
-    const privacyAgree = document.getElementById('coach-privacy-agree').checked;
-    if (!privacyAgree) {
-        showCoachError('coach-privacy', '개인정보 수집 및 이용에 동의해주세요.');
-        isValid = false;
-    }
-
-    return isValid;
-}
-
-function collectCoachFormData() {
-    const expertise = Array.from(document.querySelectorAll('input[name="expertise"]:checked'))
-        .map(cb => cb.value);
-    const coachingType = document.querySelector('input[name="coaching-type"]:checked');
-
-    return {
-        type: 'coach',
-        name: document.getElementById('coach-name').value.trim(),
-        contact: document.getElementById('coach-contact').value.trim(),
-        role: document.getElementById('coach-role').value.trim(),
-        experience: document.getElementById('coach-experience').value,
-        expertise: expertise.join(', '),
-        availability: document.getElementById('coach-availability').value.trim(),
-        coachingType: coachingType ? coachingType.value : '',
-        portfolio: document.getElementById('coach-portfolio').value.trim(),
-        rate: document.getElementById('coach-rate').value.trim(),
-        pastExperience: document.getElementById('coach-past-experience').value.trim(),
-        timestamp: new Date().toISOString()
-    };
-}
-
-// =============================================
-// Utility Functions
-// =============================================
-function showError(fieldName, message) {
-    const errorEl = document.getElementById(`error-${fieldName}`);
-    const inputEl = document.getElementById(fieldName);
-
-    if (errorEl) {
-        errorEl.textContent = message;
-    }
-
-    if (inputEl) {
-        inputEl.classList.add('error');
-    }
-}
-
-function showCoachError(fieldName, message) {
-    const errorEl = document.getElementById(`error-${fieldName}`);
-    const inputEl = document.getElementById(fieldName);
-
-    if (errorEl) {
-        errorEl.textContent = message;
-    }
-
-    if (inputEl) {
-        inputEl.classList.add('error');
-    }
-}
-
-function clearErrors() {
-    const errorElements = document.querySelectorAll('#customer-form .form-error');
-    errorElements.forEach(el => el.textContent = '');
-
-    const inputElements = document.querySelectorAll('#customer-form .error');
-    inputElements.forEach(el => el.classList.remove('error'));
-}
-
-function clearCoachErrors() {
-    const errorElements = document.querySelectorAll('#coach-form .form-error');
-    errorElements.forEach(el => el.textContent = '');
-
-    const inputElements = document.querySelectorAll('#coach-form .error');
-    inputElements.forEach(el => el.classList.remove('error'));
-}
-
-function showResult(container, type, message) {
-    container.style.display = 'block';
-    container.className = type === 'success' ? 'alert alert-success' : 'alert alert-error';
-    container.innerHTML = message;
-}
-
-function collectUTMParams() {
-    const params = new URLSearchParams(window.location.search);
-    return {
-        source: params.get('utm_source') || '',
-        medium: params.get('utm_medium') || '',
-        campaign: params.get('utm_campaign') || ''
-    };
-}
-
-async function simulateSubmission(data) {
-    // Simulate network delay
-    await new Promise(resolve => setTimeout(resolve, 1500));
-
-    // Log data to console for demo
-    console.log('Form submitted:', data);
-
-    // In production, you would send this to Google Apps Script:
-    /*
-    const response = await fetch(scriptUrl, {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data)
-    });
-    
-    if (!response.ok) {
-      throw new Error('Submission failed');
-    }
-    */
-
-    return { success: true };
-}
-
-// =============================================
-// Smooth Scrolling for Anchor Links
-// =============================================
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function (e) {
-        e.preventDefault();
-        const target = document.querySelector(this.getAttribute('href'));
-        if (target) {
-            target.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
-            });
-        }
-    });
+// ============================================================
+// DOMContentLoaded
+// ============================================================
+document.addEventListener("DOMContentLoaded", () => {
+    loadHeadhunters();
+    initAccordions();
+    initLiveUpdates();
+    initSmoothScroll();
 });
