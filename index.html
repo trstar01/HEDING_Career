@@ -432,10 +432,14 @@
         <button id="btn-no-preference" class="btn btn-secondary" onclick="toggleNoPreference()">헤드헌터 무관</button>
       </div>
 
+      <!-- 산업 필터 칩 (JS renderFilterChips()로 렌더링) -->
+      <div id="hunter-filter-chips" class="hunter-filter-chips"></div>
+
       <div class="grid grid-3 mt-lg" id="headhunter-list">
         <!-- JS로 렌더링 -->
         <div class="hunter-loading">헤드헌터 정보를 불러오는 중...</div>
       </div>
+
 
       <div id="hunter-summary" class="hunter-summary hidden">
         <strong>선택 현황:</strong> <span id="hunter-summary-text"></span>

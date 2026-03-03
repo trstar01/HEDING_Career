@@ -115,16 +115,67 @@ function openCoaching(state) {
 }
 
 // ============================================================
+// INDUSTRY_DICT (13개 canonical 키워드)
+// ============================================================
+const INDUSTRY_DICT = [
+    { canonical: "IT", aliases: ["it", "s/w", "sw", "software", "saas", "플랫폼", "클라우드", "데이터", "ai", "인공지능", "iot", "통신", "테크", "tech"] },
+    { canonical: "반도체/디스플레이", aliases: ["반도체", "semicon", "fab", "foundry", "패키징", "osat", "wafer", "디스플레이", "oled", "lcd"] },
+    { canonical: "2차전지", aliases: ["2차전지", "배터리", "전지", "cell", "pack", "bms"] },
+    { canonical: "자동차/모빌리티", aliases: ["자동차", "모빌리티", "전기차", "ev", "차량", "완성차", "자율주행", "adas", "오토모티브", "automotive"] },
+    { canonical: "제조/엔지니어링", aliases: ["제조", "engineering", "엔지니어링", "기계", "장비", "중공업", "조선", "자동화", "공장", "스마트팩토리", "로봇", "로보틱스", "물류자동화"] },
+    { canonical: "화학/에너지", aliases: ["화학", "석유화학", "오일", "가스", "oil", "gas", "에너지", "전력", "발전", "장치산업"] },
+    { canonical: "건설/플랜트", aliases: ["건설", "플랜트", "토목", "시공", "enc"] },
+    { canonical: "부동산", aliases: ["부동산", "부동산개발", "pf", "개발사업"] },
+    { canonical: "금융", aliases: ["금융", "은행", "증권", "보험", "캐피탈", "핀테크", "finance", "컨설팅", "consulting"] },
+    { canonical: "바이오/제약/의료", aliases: ["바이오", "제약", "의료", "헬스케어", "임상", "진단", "의료기기", "건강기능식품"] },
+    { canonical: "소비재(FMCG)", aliases: ["소비재", "fmcg", "식품", "음료", "화장품", "뷰티", "생활용품", "패션"] },
+    { canonical: "유통/커머스", aliases: ["유통", "커머스", "이커머스", "e-commerce", "리테일", "md", "상품기획", "프랜차이즈", "외식", "f&b", "식음료"] },
+    { canonical: "마케팅/PR/경영지원", aliases: ["마케팅", "광고", "홍보", "pr", "ir", "crm", "브랜드", "커뮤니케이션", "인사", "hr", "재무", "회계", "기획", "전략", "법무", "총무", "경영지원"] }
+];
+
+// 우선순위 (상위부터 출력, 최대 6개)
+const INDUSTRY_PRIORITY = [
+    "반도체/디스플레이", "2차전지", "자동차/모빌리티", "바이오/제약/의료",
+    "IT", "금융", "건설/플랜트", "부동산", "화학/에너지",
+    "제조/엔지니어링", "소비재(FMCG)", "유통/커머스", "마케팅/PR/경영지원"
+];
+
+// 필터 칩 UI용 순서 (전체 + 13개)
+const FILTER_CHIPS = INDUSTRY_PRIORITY;
+
+/**
+ * 텍스트(bio + tags 등)에서 canonical 키워드 추출
+ * - 충돌(자동차 vs 제조) 허용: 둘 다 감지되면 둘 다 반환
+ * - INDUSTRY_PRIORITY 순대로 정렬 후 최대 6개 반환
+ */
+function extractKeywords(text) {
+    const lower = (text || "").toLowerCase();
+    const matched = new Set();
+
+    INDUSTRY_DICT.forEach(({ canonical, aliases }) => {
+        if (aliases.some(a => lower.includes(a.toLowerCase()))) {
+            matched.add(canonical);
+        }
+    });
+
+    // 우선순위 정렬 후 최대 6개
+    const sorted = INDUSTRY_PRIORITY.filter(c => matched.has(c));
+    return sorted.slice(0, 6);
+}
+
+// ============================================================
 // 헤드헌터 전역 상태
 // ============================================================
 const hunterState = {
     none: false,
     rank1: null, rank2: null, rank3: null,
-    names: {}  // id -> name
+    names: {},       // id -> name
+    all: [],         // 전체 헤드헌터 배열
+    activeFilter: "전체"  // 현재 필터 칩
 };
 
 // ============================================================
-// 헤드헌터 렌더링 (JSON fetch)
+// 헤드헌터 렌더링 (JSON fetch + 필터 칩)
 // ============================================================
 async function loadHeadhunters() {
     const container = document.getElementById("headhunter-list");
@@ -133,15 +184,64 @@ async function loadHeadhunters() {
         if (!res.ok) throw new Error("fetch error");
         const hunters = await res.json();
 
-        container.innerHTML = "";
+        // keywords 추출 및 캐싱
         hunters.forEach(hh => {
+            const searchText = [hh.bio, ...(hh.tags || [])].join(" ");
+            hh.keywords = hh.keywords && hh.keywords.length
+                ? hh.keywords   // JSON에 명시된 경우 우선 사용
+                : extractKeywords(searchText);
+            if (!hh.keywords.length) hh.keywords = ["기타"];
             hunterState.names[hh.id] = hh.name;
-            const card = createHunterCard(hh);
-            container.appendChild(card);
         });
+        hunterState.all = hunters;
+
+        // 필터 칩 렌더링
+        renderFilterChips();
+        // 카드 렌더링
+        renderHunterCards(hunters);
     } catch (err) {
         container.innerHTML = `<div class="hunter-loading">헤드헌터 정보를 불러올 수 없습니다. (${err.message})</div>`;
     }
+}
+
+// 필터 칩 렌더링
+function renderFilterChips() {
+    const wrap = document.getElementById("hunter-filter-chips");
+    if (!wrap) return;
+
+    const all = ["전체", ...FILTER_CHIPS];
+    wrap.innerHTML = all.map(label => {
+        const active = label === hunterState.activeFilter ? "active" : "";
+        return `<button class="filter-chip ${active}" onclick="applyFilter('${label}')">${label}</button>`;
+    }).join("");
+}
+
+// 필터 적용
+function applyFilter(label) {
+    hunterState.activeFilter = label;
+    renderFilterChips();
+
+    const filtered = label === "전체"
+        ? hunterState.all
+        : hunterState.all.filter(hh => hh.keywords.includes(label));
+
+    renderHunterCards(filtered);
+}
+
+// 카드 렌더링
+function renderHunterCards(hunters) {
+    const container = document.getElementById("headhunter-list");
+    if (!hunters.length) {
+        container.innerHTML = `<div class="hunter-loading">해당 산업 전문 헤드헌터를 준비 중입니다.</div>`;
+        return;
+    }
+    container.innerHTML = "";
+    hunters.forEach(hh => {
+        const card = createHunterCard(hh);
+        container.appendChild(card);
+    });
+    // 선택 상태 복원
+    refreshHunterUI();
 }
 
 function createHunterCard(hh) {
@@ -149,8 +249,13 @@ function createHunterCard(hh) {
     card.className = "hunter-card";
     card.dataset.id = hh.id;
 
-    // 아바타 이니셜
     const initial = hh.name ? hh.name[0] : "?";
+    // 키워드 뱃지 (기타 제외, 최대 3개)
+    const kwBadges = (hh.keywords || [])
+        .filter(k => k !== "기타")
+        .slice(0, 3)
+        .map(k => `<span class="hunter-kw-badge">${k}</span>`)
+        .join("");
 
     card.innerHTML = `
     <div class="hunter-avatar">${initial}</div>
@@ -158,6 +263,7 @@ function createHunterCard(hh) {
     <div class="hunter-tags">
       ${(hh.tags || []).map(t => `<span class="hunter-tag">${t}</span>`).join("")}
     </div>
+    ${kwBadges ? `<div class="hunter-kw-badges">${kwBadges}</div>` : ""}
     <div class="hunter-bio">${hh.bio}</div>
     <div class="hunter-btn-wrap">
       <button class="btn-hunter" data-id="${hh.id}" onclick="handleHunterClick(${hh.id}, this)">
