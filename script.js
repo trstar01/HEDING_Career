@@ -115,52 +115,87 @@ function openCoaching(state) {
 }
 
 // ============================================================
-// INDUSTRY_DICT (13개 canonical 키워드)
+// Google Sheets CSV URL (헤드헌터 데이터)
 // ============================================================
-const INDUSTRY_DICT = [
-    { canonical: "IT", aliases: ["it", "s/w", "sw", "software", "saas", "플랫폼", "클라우드", "데이터", "ai", "인공지능", "iot", "통신", "테크", "tech"] },
-    { canonical: "반도체/디스플레이", aliases: ["반도체", "semicon", "fab", "foundry", "패키징", "osat", "wafer", "디스플레이", "oled", "lcd"] },
-    { canonical: "2차전지", aliases: ["2차전지", "배터리", "전지", "cell", "pack", "bms"] },
-    { canonical: "자동차/모빌리티", aliases: ["자동차", "모빌리티", "전기차", "ev", "차량", "완성차", "자율주행", "adas", "오토모티브", "automotive"] },
-    { canonical: "제조/엔지니어링", aliases: ["제조", "engineering", "엔지니어링", "기계", "장비", "중공업", "조선", "자동화", "공장", "스마트팩토리", "로봇", "로보틱스", "물류자동화"] },
-    { canonical: "화학/에너지", aliases: ["화학", "석유화학", "오일", "가스", "oil", "gas", "에너지", "전력", "발전", "장치산업"] },
-    { canonical: "건설/플랜트", aliases: ["건설", "플랜트", "토목", "시공", "enc"] },
-    { canonical: "부동산", aliases: ["부동산", "부동산개발", "pf", "개발사업"] },
-    { canonical: "금융", aliases: ["금융", "은행", "증권", "보험", "캐피탈", "핀테크", "finance", "컨설팅", "consulting"] },
-    { canonical: "바이오/제약/의료", aliases: ["바이오", "제약", "의료", "헬스케어", "임상", "진단", "의료기기", "건강기능식품"] },
-    { canonical: "소비재(FMCG)", aliases: ["소비재", "fmcg", "식품", "음료", "화장품", "뷰티", "생활용품", "패션"] },
-    { canonical: "유통/커머스", aliases: ["유통", "커머스", "이커머스", "e-commerce", "리테일", "md", "상품기획", "프랜차이즈", "외식", "f&b", "식음료"] },
-    { canonical: "마케팅/PR/경영지원", aliases: ["마케팅", "광고", "홍보", "pr", "ir", "crm", "브랜드", "커뮤니케이션", "인사", "hr", "재무", "회계", "기획", "전략", "법무", "총무", "경영지원"] }
-];
+const SHEET_CSV_URL =
+    "https://docs.google.com/spreadsheets/d/16QHDmZCrwEmeDLB8Nfuw5aUwlyfOAasTix_WIgh3me8/export?format=csv&gid=1700676662";
 
-// 우선순위 (상위부터 출력, 최대 6개)
-const INDUSTRY_PRIORITY = [
-    "반도체/디스플레이", "2차전지", "자동차/모빌리티", "바이오/제약/의료",
-    "IT", "금융", "건설/플랜트", "부동산", "화학/에너지",
-    "제조/엔지니어링", "소비재(FMCG)", "유통/커머스", "마케팅/PR/경영지원"
-];
+// ============================================================
+// parseKeywords (고정 함수 - 변경 금지)
+// ============================================================
+function parseKeywords(raw) {
+    if (!raw) return [];
+    let s = String(raw);
 
-// 필터 칩 UI용 순서 (전체 + 13개)
-const FILTER_CHIPS = INDUSTRY_PRIORITY;
+    s = s
+        .replace(/\s+and\s+/ig, ",")
+        .replace(/및/g, ",")
+        .replace(/[\/·\|&]/g, ",")
+        .replace(/;/g, ",")
+        .replace(/\s*,\s*/g, ",");
 
-/**
- * 텍스트(bio + tags 등)에서 canonical 키워드 추출
- * - 충돌(자동차 vs 제조) 허용: 둘 다 감지되면 둘 다 반환
- * - INDUSTRY_PRIORITY 순대로 정렬 후 최대 6개 반환
- */
-function extractKeywords(text) {
-    const lower = (text || "").toLowerCase();
-    const matched = new Set();
+    const parts = s.split(",")
+        .map(x => x.trim())
+        .filter(Boolean);
 
-    INDUSTRY_DICT.forEach(({ canonical, aliases }) => {
-        if (aliases.some(a => lower.includes(a.toLowerCase()))) {
-            matched.add(canonical);
-        }
+    const normalized = parts.map(k => {
+        const low = k.toLowerCase();
+        if (low === "it") return "IT";
+        if (low === "cosmetic" || low === "cosmetics" || k === "코스매틱") return "화장품";
+        return k;
     });
 
-    // 우선순위 정렬 후 최대 6개
-    const sorted = INDUSTRY_PRIORITY.filter(c => matched.has(c));
-    return sorted.slice(0, 6);
+    return [...new Set(normalized)];
+}
+
+// ============================================================
+// stableHash: 같은 입력에 항상 같은 정수를 반환 (id 생성용)
+// ============================================================
+function stableHash(str) {
+    let h = 0;
+    for (let i = 0; i < str.length; i++) {
+        h = Math.imul(31, h) + str.charCodeAt(i) | 0;
+    }
+    return Math.abs(h);
+}
+
+// ============================================================
+// CSV 파싱 (RFC 4180 간소화 버전)
+// ============================================================
+function parseCSV(text) {
+    const lines = text.split(/\r?\n/);
+    if (!lines.length) return [];
+
+    const parseRow = (line) => {
+        const cols = [];
+        let cur = "";
+        let inQ = false;
+        for (let i = 0; i < line.length; i++) {
+            const ch = line[i];
+            if (inQ) {
+                if (ch === '"' && line[i + 1] === '"') { cur += '"'; i++; }
+                else if (ch === '"') { inQ = false; }
+                else { cur += ch; }
+            } else {
+                if (ch === '"') { inQ = true; }
+                else if (ch === ',') { cols.push(cur); cur = ""; }
+                else { cur += ch; }
+            }
+        }
+        cols.push(cur);
+        return cols;
+    };
+
+    const headers = parseRow(lines[0]);
+    const rows = [];
+    for (let i = 1; i < lines.length; i++) {
+        if (!lines[i].trim()) continue;
+        const cols = parseRow(lines[i]);
+        const obj = {};
+        headers.forEach((h, idx) => { obj[h.trim()] = (cols[idx] || "").trim(); });
+        rows.push(obj);
+    }
+    return rows;
 }
 
 // ============================================================
@@ -169,102 +204,192 @@ function extractKeywords(text) {
 const hunterState = {
     none: false,
     rank1: null, rank2: null, rank3: null,
-    names: {},       // id -> name
-    all: [],         // 전체 헤드헌터 배열
-    activeFilter: "전체"  // 현재 필터 칩
+    names: {},          // id -> name
+    all: [],            // 전체 헤드헌터 배열
+    activeFilter: "전체",
+    expanded: false,    // 더보기 상태
+    searchQuery: ""     // 검색어
 };
 
 // ============================================================
-// 헤드헌터 렌더링 (JSON fetch + 필터 칩)
+// 셔플 (Fisher-Yates)
+// ============================================================
+function shuffle(arr) {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+}
+
+// ============================================================
+// 이름 기준 정렬
+// ============================================================
+function sortByName(arr) {
+    return [...arr].sort((a, b) => a.name.localeCompare(b.name, "ko"));
+}
+
+// ============================================================
+// Google Sheets CSV 로딩 & 헤드헌터 초기화
 // ============================================================
 async function loadHeadhunters() {
     const container = document.getElementById("headhunter-list");
     try {
-        const res = await fetch("./heding-headhunters.json");
-        if (!res.ok) throw new Error("fetch error");
-        const hunters = await res.json();
+        const res = await fetch(SHEET_CSV_URL);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const text = await res.text();
+        const rows = parseCSV(text);
 
-        // keywords 추출 및 캐싱
+        // 컬럼 매핑 + keywords 파싱
+        const hunters = rows
+            .map(r => {
+                const name = r["성명"] || "";
+                const title = r["직급"] || "";
+                const keywordsRaw = r["주요산업군"] || "";
+                if (!name) return null;
+                return {
+                    id: stableHash(name + "|" + title + "|" + keywordsRaw),
+                    name,
+                    title,
+                    keywords: parseKeywords(keywordsRaw)
+                };
+            })
+            .filter(Boolean);
+
         hunters.forEach(hh => {
-            const searchText = [hh.bio, ...(hh.tags || [])].join(" ");
-            hh.keywords = hh.keywords && hh.keywords.length
-                ? hh.keywords   // JSON에 명시된 경우 우선 사용
-                : extractKeywords(searchText);
-            if (!hh.keywords.length) hh.keywords = ["기타"];
             hunterState.names[hh.id] = hh.name;
         });
         hunterState.all = hunters;
 
-        // 필터 칩 렌더링
+        // 필터 칩 렌더링 (실제 keywords에서 빌드)
         renderFilterChips();
         // 카드 렌더링
-        renderHunterCards(hunters);
+        renderHunterCards();
+
     } catch (err) {
         container.innerHTML = `<div class="hunter-loading">헤드헌터 정보를 불러올 수 없습니다. (${err.message})</div>`;
     }
 }
 
-// 필터 칩 렌더링
+// ============================================================
+// 필터 칩 렌더링 (실제 keywords 기반)
+// ============================================================
 function renderFilterChips() {
     const wrap = document.getElementById("hunter-filter-chips");
     if (!wrap) return;
 
-    const all = ["전체", ...FILTER_CHIPS];
-    wrap.innerHTML = all.map(label => {
+    // 전체 헤드헌터에서 unique 키워드 수집 -> 가나다 정렬
+    const allKw = [...new Set(hunterState.all.flatMap(hh => hh.keywords))].sort((a, b) =>
+        a.localeCompare(b, "ko")
+    );
+
+    const chips = ["전체", ...allKw];
+    wrap.innerHTML = chips.map(label => {
         const active = label === hunterState.activeFilter ? "active" : "";
-        return `<button class="filter-chip ${active}" onclick="applyFilter('${label}')">${label}</button>`;
+        // 싱글쿼트 이스케이프
+        const safeLabel = label.replace(/'/g, "\\'");
+        return `<button class="filter-chip ${active}" onclick="applyFilter('${safeLabel}')">${label}</button>`;
     }).join("");
 }
 
-// 필터 적용
+// ============================================================
+// 필터 적용 (expanded 리셋)
+// ============================================================
 function applyFilter(label) {
     hunterState.activeFilter = label;
+    hunterState.expanded = false;
     renderFilterChips();
-
-    const filtered = label === "전체"
-        ? hunterState.all
-        : hunterState.all.filter(hh => hh.keywords.includes(label));
-
-    renderHunterCards(filtered);
+    renderHunterCards();
 }
 
-// 카드 렌더링
-function renderHunterCards(hunters) {
+// ============================================================
+// 카드 렌더링 (랜덤9 + 더보기/접기)
+// ============================================================
+function getBaseList() {
+    const { all, activeFilter, searchQuery } = hunterState;
+
+    let base = activeFilter === "전체"
+        ? all
+        : all.filter(hh => hh.keywords.includes(activeFilter));
+
+    if (searchQuery) {
+        const q = searchQuery.toLowerCase();
+        base = base.filter(hh =>
+            hh.name.toLowerCase().includes(q) ||
+            hh.title.toLowerCase().includes(q) ||
+            hh.keywords.some(k => k.toLowerCase().includes(q))
+        );
+    }
+    return base;
+}
+
+function renderHunterCards() {
     const container = document.getElementById("headhunter-list");
-    if (!hunters.length) {
-        container.innerHTML = `<div class="hunter-loading">해당 산업 전문 헤드헌터를 준비 중입니다.</div>`;
+    const moreBtn = document.getElementById("hunter-more-btn");
+
+    const base = getBaseList();
+    const isDefault = hunterState.activeFilter === "전체" && !hunterState.searchQuery;
+
+    // 표시할 목록 결정
+    let display;
+    if (hunterState.expanded) {
+        display = isDefault ? shuffle(base) : sortByName(base);
+        if (moreBtn) { moreBtn.textContent = "접기"; moreBtn.style.display = ""; }
+    } else {
+        display = isDefault
+            ? shuffle(base).slice(0, 9)
+            : sortByName(base).slice(0, 9);
+        if (moreBtn) { moreBtn.textContent = "더보기"; moreBtn.style.display = base.length > 9 ? "" : "none"; }
+    }
+
+    // 더보기 버튼 가시성
+    if (moreBtn) {
+        moreBtn.style.display = base.length > 9 ? "" : "none";
+    }
+
+    if (!display.length) {
+        container.innerHTML = `<div class="hunter-loading">해당 조건의 헤드헌터를 준비 중입니다.</div>`;
         return;
     }
+
     container.innerHTML = "";
-    hunters.forEach(hh => {
-        const card = createHunterCard(hh);
-        container.appendChild(card);
-    });
-    // 선택 상태 복원
+    display.forEach(hh => container.appendChild(createHunterCard(hh)));
     refreshHunterUI();
 }
 
+// ============================================================
+// 더보기/접기 토글
+// ============================================================
+function toggleExpand() {
+    hunterState.expanded = !hunterState.expanded;
+    renderHunterCards();
+}
+
+// ============================================================
+// 헤드헌터 카드 생성 (이름/직급 + 키워드 칩만 표시)
+// ============================================================
 function createHunterCard(hh) {
     const card = document.createElement("div");
     card.className = "hunter-card";
     card.dataset.id = hh.id;
 
-    const initial = hh.name ? hh.name[0] : "?";
-    // 키워드 뱃지 (기타 제외, 최대 3개)
-    const kwBadges = (hh.keywords || [])
-        .filter(k => k !== "기타")
-        .slice(0, 3)
-        .map(k => `<span class="hunter-kw-badge">${k}</span>`)
-        .join("");
+    // 키워드 칩: 최대 6개, 초과분은 +N 표시
+    const MAX_KW = 6;
+    const kws = hh.keywords || [];
+    const visible = kws.slice(0, MAX_KW);
+    const overflow = kws.length - MAX_KW;
+
+    const kwHtml = visible.map(k =>
+        `<span class="hunter-kw-badge">${k}</span>`
+    ).join("") + (overflow > 0 ? `<span class="hunter-kw-more">+${overflow}</span>` : "");
 
     card.innerHTML = `
-    <div class="hunter-avatar">${initial}</div>
-    <div class="hunter-name">${hh.name}</div>
-    <div class="hunter-tags">
-      ${(hh.tags || []).map(t => `<span class="hunter-tag">${t}</span>`).join("")}
+    <div class="hunter-identity">
+      <span class="hunter-name">${hh.name}</span>
+      <span class="hunter-title">${hh.title}</span>
     </div>
-    ${kwBadges ? `<div class="hunter-kw-badges">${kwBadges}</div>` : ""}
-    <div class="hunter-bio">${hh.bio}</div>
+    <div class="hunter-kw-badges">${kwHtml || '<span class="hunter-kw-badge">-</span>'}</div>
     <div class="hunter-btn-wrap">
       <button class="btn-hunter" data-id="${hh.id}" onclick="handleHunterClick(${hh.id}, this)">
         선택하기
@@ -273,6 +398,8 @@ function createHunterCard(hh) {
   `;
     return card;
 }
+
+
 
 function handleHunterClick(id, btn) {
     // 무관 상태면 초기화 후 진행

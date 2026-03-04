@@ -440,6 +440,11 @@
         <div class="hunter-loading">헤드헌터 정보를 불러오는 중...</div>
       </div>
 
+      <!-- 더보기/접기 버튼 -->
+      <div class="hunter-more-wrap">
+        <button id="hunter-more-btn" class="btn btn-secondary" onclick="toggleExpand()"
+          style="display:none">더보기</button>
+      </div>
 
       <div id="hunter-summary" class="hunter-summary hidden">
         <strong>선택 현황:</strong> <span id="hunter-summary-text"></span>
@@ -586,9 +591,7 @@
     <div class="container">
       <div class="footer-inner">
         <div class="footer-brand">
-          <a href="https://heding.co.kr" target="_blank" rel="noopener noreferrer">
-            <img src="https://cdn.imweb.me/thumbnail/20240314/beab70c98724e.png" alt="HEDING" class="footer-logo">
-          </a>
+          <p class="footer-brand-name">HEDING</p>
           <p>실전 커리어 전략, 헤드헌터와 함께</p>
         </div>
         <div class="footer-links">
@@ -793,6 +796,11 @@
       </div>
     </div>
   </div>
+
+  <a id="heding-floating-logo" href="https://heding.co.kr" target="_blank" rel="noopener noreferrer"
+    aria-label="HEDING">
+    <img src="https://cdn.imweb.me/thumbnail/20240314/beab70c98724e.png" alt="HEDING" />
+  </a>
 
   <script src="script.js"></script>
 </body>
