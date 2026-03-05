@@ -673,10 +673,46 @@
               (139,000원)</label>
           </div>
         </div>
-        <!-- 헤드헌터 선호 (읽기전용) -->
+        <!-- 산업군 (필수) -->
         <div class="form-group">
-          <label class="form-label">헤드헌터 선호 <span class="badge-readonly">자동 반영</span></label>
-          <input type="text" id="c-hunter-display" class="form-input" readonly>
+          <label class="form-label required">산업군</label>
+          <div class="industry-row">
+            <select id="c-industry-main" class="form-input">
+              <option value="">대분류 선택 *</option>
+              <option>IT</option>
+              <option>반도체/디스플레이</option>
+              <option>2차전지</option>
+              <option>자동차/모빌리티</option>
+              <option>제조/엔지니어링</option>
+              <option>화학/에너지</option>
+              <option>건설/플랜트</option>
+              <option>부동산</option>
+              <option>금융</option>
+              <option>바이오/제약/의료</option>
+              <option>소비재(FMCG)</option>
+              <option>유통/커머스</option>
+              <option>마케팅/PR/경영지원</option>
+              <option>기타</option>
+            </select>
+            <input type="text" id="c-industry-sub" class="form-input" placeholder="중분류 (예:소프트웨어, 영업, 재무 등)">
+          </div>
+          <span class="form-error" id="err-c-industry"></span>
+        </div>
+        <!-- 희망 헤드헌터 -->
+        <div class="form-group">
+          <label class="form-label">희망 헤드헌터</label>
+          <div class="radio-group">
+            <label class="radio-label"><input type="radio" name="c-hunter-yn" value="없음" checked
+                onchange="toggleHunterInput('consulting')"> 없음 (자동 매칭)</label>
+            <label class="radio-label"><input type="radio" name="c-hunter-yn" value="있음"
+                onchange="toggleHunterInput('consulting')"> 있음 (직접 입력)</label>
+          </div>
+          <div id="c-hunter-input-wrap" style="display:none; margin-top:8px;">
+            <input type="text" id="c-hunter-name" class="form-input"
+              placeholder="예: 홍길동(팀/직급을 알면 함께). 정확한 성명이 아니면 '없음' 권장">
+          </div>
+          <span class="form-hint hunter-warn">화면에서 선택하신 헤드헌터 정보는 위 요약에 자동 반영됩니다.</span>
+          <span class="form-hint hunter-warn warn-typo">⚠️ 정확한 성명을 모르시면 '없음'을 선택해 주세요. 오타가 있으면 매칭이 지연될 수 있습니다.</span>
         </div>
         <!-- 개인정보 동의 -->
         <div class="form-group">
@@ -735,11 +771,31 @@
           <input type="text" id="p-role" class="form-input" placeholder="예: 프로덕트 매니저">
           <span class="form-error" id="err-p-role"></span>
         </div>
-        <!-- 산업 -->
+        <!-- 산업 (선택) -->
         <div class="form-group">
-          <label class="form-label required" for="p-industry">산업</label>
-          <input type="text" id="p-industry" class="form-input" placeholder="예: IT/스타트업">
-          <span class="form-error" id="err-p-industry"></span>
+          <label class="form-label" for="p-industry">산업군 <span class="badge-optional">선택</span></label>
+          <div class="industry-row">
+            <select id="p-industry-main" class="form-input">
+              <option value="">대분류 선택</option>
+              <option>IT</option>
+              <option>반도체/디스플레이</option>
+              <option>2차전지</option>
+              <option>자동차/모빌리티</option>
+              <option>제조/엔지니어링</option>
+              <option>화학/에너지</option>
+              <option>건설/플랜트</option>
+              <option>부동산</option>
+              <option>금융</option>
+              <option>바이오/제약/의료</option>
+              <option>소비재(FMCG)</option>
+              <option>유통/커머스</option>
+              <option>마케팅/PR/경영지원</option>
+              <option>기타</option>
+            </select>
+            <input type="text" id="p-industry-sub" class="form-input" placeholder="중분류 (예:소프트웨어, 영업, HR 등)">
+          </div>
+          <!-- 코칭 모달용 hidden industry(Google Forms entry 호환) -->
+          <input type="hidden" id="p-industry">
         </div>
         <!-- 연차 -->
         <div class="form-group">

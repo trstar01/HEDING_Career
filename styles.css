@@ -1367,3 +1367,46 @@ section {
   letter-spacing: .04em;
   margin-bottom: 6px;
 }
+
+/* ---- 산업군 대분류+중분류 row ---- */
+.industry-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.industry-row select,
+.industry-row input {
+  flex: 1;
+  min-width: 120px;
+}
+
+/* ---- 선택 뱃지 ---- */
+.badge-optional {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  background: #f1f5f9;
+  color: var(--text-secondary);
+  padding: 1px 8px;
+  border-radius: var(--radius-full);
+  margin-left: 4px;
+  vertical-align: middle;
+}
+
+/* ---- 헌터 오타방지 안내문구 ---- */
+.hunter-warn {
+  display: block;
+  font-size: 12px;
+  color: var(--text-tertiary);
+  margin-top: 4px;
+  line-height: 1.5;
+}
+
+.warn-typo {
+  color: #b45309;
+  background: #fffbeb;
+  border-radius: 6px;
+  padding: 4px 8px;
+  margin-top: 6px;
+}

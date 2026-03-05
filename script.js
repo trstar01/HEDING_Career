@@ -555,37 +555,70 @@ document.querySelectorAll(".modal-overlay").forEach(overlay => {
 });
 
 // ============================================================
+// 헌터 있음/없음 토글
+// ============================================================
+function toggleHunterInput(form) {
+    if (form === 'consulting') {
+        const yn = (document.querySelector("input[name='c-hunter-yn']:checked") || {}).value;
+        const wrap = document.getElementById('c-hunter-input-wrap');
+        if (wrap) wrap.style.display = (yn === '있음') ? '' : 'none';
+    }
+    updateConsultingSummary();
+}
+
+// ============================================================
 // 컨설팅 검증 & 제출
 // ============================================================
 function getConsultingState() {
+    const industryMain = (document.getElementById('c-industry-main') || {}).value || '';
+    const industrySub = (document.getElementById('c-industry-sub') || {}).value.trim() || '';
+    const industryLabel = industryMain
+        ? (industrySub ? `${industryMain} > ${industrySub}` : industryMain)
+        : '';
+
+    const hunterYn = (document.querySelector("input[name='c-hunter-yn']:checked") || {}).value || '없음';
+    const hunterName = (document.getElementById('c-hunter-name') || {}).value.trim() || '';
+    const hunterPref = hunterYn === '있음' && hunterName ? hunterName : '없음';
+
     return {
-        name: document.getElementById("c-name").value.trim(),
-        email: document.getElementById("c-email").value.trim(),
-        phone: document.getElementById("c-phone").value.trim(),
+        name: document.getElementById('c-name').value.trim(),
+        email: document.getElementById('c-email').value.trim(),
+        phone: document.getElementById('c-phone').value.trim(),
         services: Array.from(document.querySelectorAll("input[name='c-services']:checked")).map(c => c.value),
-        package: (document.querySelector("input[name='c-package']:checked") || {}).value || "",
-        consent: document.getElementById("c-consent").checked
+        package: (document.querySelector("input[name='c-package']:checked") || {}).value || '',
+        industryMain,
+        industrySub,
+        industryLabel,
+        hunterYn,
+        hunterName,
+        hunterPref,
+        consent: document.getElementById('c-consent').checked
     };
 }
 
 function validateConsulting(state) {
     let ok = true;
-    clearErrors("modal-consulting");
+    clearErrors('modal-consulting');
 
     if (!state.name) {
-        showError("err-c-name", "이름을 입력해주세요.");
+        showError('err-c-name', '이름을 입력해주세요.');
         ok = false;
     }
     if (!state.email && !state.phone) {
-        showError("err-c-contact", "이메일 또는 휴대폰 중 하나를 입력해주세요.");
+        showError('err-c-contact', '이메일 또는 휴대폰 중 하나를 입력해주세요.');
         ok = false;
     }
     if (state.services.length === 0 && !state.package) {
-        showError("err-c-services", "서비스 또는 패키지를 최소 1개 선택해주세요.");
+        showError('err-c-services', '서비스 또는 패키지를 최소 1개 선택해주세요.');
+        ok = false;
+    }
+    // 산업군 필수
+    if (!state.industryMain) {
+        showError('err-c-industry', '콘설팅 신청은 산업군 선택이 필수입니다.');
         ok = false;
     }
     if (!state.consent) {
-        showError("err-c-consent", "개인정보 수집 및 이용에 동의해주세요.");
+        showError('err-c-consent', '개인정보 수집 및 이용에 동의해주세요.');
         ok = false;
     }
     return ok;
@@ -601,33 +634,45 @@ function submitConsulting() {
 // 코칭 검증 & 제출
 // ============================================================
 function getCoachingState() {
+    const industryLabel = getCoachingIndustryLabel();
+    // Google Forms entry 호환용 hidden input 동기화
+    const hiddenInd = document.getElementById('p-industry');
+    if (hiddenInd) hiddenInd.value = industryLabel;
+
     return {
-        name: document.getElementById("p-name").value.trim(),
-        email: document.getElementById("p-email").value.trim(),
-        phone: document.getElementById("p-phone").value.trim(),
-        role: document.getElementById("p-role").value.trim(),
-        industry: document.getElementById("p-industry").value.trim(),
-        years: document.getElementById("p-years").value.trim(),
+        name: document.getElementById('p-name').value.trim(),
+        email: document.getElementById('p-email').value.trim(),
+        phone: document.getElementById('p-phone').value.trim(),
+        role: document.getElementById('p-role').value.trim(),
+        industry: industryLabel,
+        years: document.getElementById('p-years').value.trim(),
         topics: Array.from(document.querySelectorAll("input[name='p-topics']:checked")).map(c => c.value),
         availability: Array.from(document.querySelectorAll("input[name='p-availability']:checked")).map(c => c.value),
-        type: (document.querySelector("input[name='p-type']:checked") || {}).value || ""
+        type: (document.querySelector("input[name='p-type']:checked") || {}).value || ''
     };
+}
+
+function getCoachingIndustryLabel() {
+    const main = (document.getElementById('p-industry-main') || {}).value || '';
+    const sub = ((document.getElementById('p-industry-sub') || {}).value || '').trim();
+    return main ? (sub ? `${main} > ${sub}` : main) : '';
 }
 
 function validateCoaching(state) {
     let ok = true;
-    clearErrors("modal-coaching");
+    clearErrors('modal-coaching');
 
-    if (!state.name) { showError("err-p-name", "이름을 입력해주세요."); ok = false; }
-    if (!state.email) { showError("err-p-email", "이메일을 입력해주세요."); ok = false; }
-    if (!state.role) { showError("err-p-role", "직무/분야를 입력해주세요."); ok = false; }
-    if (!state.industry) { showError("err-p-industry", "산업을 입력해주세요."); ok = false; }
-    if (!state.years) { showError("err-p-years", "경력 연차를 입력해주세요."); ok = false; }
-    if (state.topics.length === 0) { showError("err-p-topics", "코칭 주제를 최소 1개 선택해주세요."); ok = false; }
-    if (state.availability.length === 0) { showError("err-p-availability", "가능 시간대를 최소 1개 선택해주세요."); ok = false; }
-    if (!state.type) { showError("err-p-type", "코칭 형태를 선택해주세요."); ok = false; }
+    if (!state.name) { showError('err-p-name', '이름을 입력해주세요.'); ok = false; }
+    if (!state.email) { showError('err-p-email', '이메일을 입력해주세요.'); ok = false; }
+    if (!state.role) { showError('err-p-role', '직무/분야를 입력해주세요.'); ok = false; }
+    // 산업군 선택 → 검증 없음 (optional)
+    if (!state.years) { showError('err-p-years', '경력 연차를 입력해주세요.'); ok = false; }
+    if (state.topics.length === 0) { showError('err-p-topics', '코칭 주제를 최소 1개 선택해주세요.'); ok = false; }
+    if (state.availability.length === 0) { showError('err-p-availability', '가능 시간대를 최소 1개 선택해주세요.'); ok = false; }
+    if (!state.type) { showError('err-p-type', '코칭 형태를 선택해주세요.'); ok = false; }
     return ok;
 }
+
 
 function submitCoaching() {
     const state = getCoachingState();
@@ -644,12 +689,13 @@ function updateConsultingSummary() {
     if (state.name) lines.push(`이름: ${state.name}`);
     if (state.email) lines.push(`이메일: ${state.email}`);
     if (state.phone) lines.push(`휴대폰: ${state.phone}`);
-    if (state.services.length) lines.push(`서비스: ${state.services.join(", ")}`);
+    if (state.services.length) lines.push(`서비스: ${state.services.join(', ')}`);
     if (state.package) lines.push(`패키지: ${state.package}`);
-    lines.push(`헤드헌터 선호: ${hunterPrefText()}`);
-    lines.push(`개인정보동의: ${state.consent ? "동의" : "미동의"}`);
-    const el = document.getElementById("c-summary");
-    if (el) el.value = lines.join("\n");
+    lines.push(`선택 산업군: ${state.industryLabel || '미선택'}`);
+    lines.push(`희망 헤드헌터: ${state.hunterPref}`);
+    lines.push(`개인정보동의: ${state.consent ? '동의' : '미동의'}`);
+    const el = document.getElementById('c-summary');
+    if (el) el.value = lines.join('\n');
 }
 
 function updateCoachingSummary() {
@@ -659,13 +705,13 @@ function updateCoachingSummary() {
     if (state.email) lines.push(`이메일: ${state.email}`);
     if (state.phone) lines.push(`휴대폰: ${state.phone}`);
     if (state.role) lines.push(`직무: ${state.role}`);
-    if (state.industry) lines.push(`산업: ${state.industry}`);
+    lines.push(`선택 산업군: ${state.industry || '미선택'}`);
     if (state.years) lines.push(`연차: ${state.years}`);
-    if (state.topics.length) lines.push(`코칭주제: ${state.topics.join(", ")}`);
-    if (state.availability.length) lines.push(`가능시간: ${state.availability.join(", ")}`);
+    if (state.topics.length) lines.push(`코칭주제: ${state.topics.join(', ')}`);
+    if (state.availability.length) lines.push(`가능시간: ${state.availability.join(', ')}`);
     if (state.type) lines.push(`코칭형태: ${state.type}`);
-    const el = document.getElementById("p-summary");
-    if (el) el.value = lines.join("\n");
+    const el = document.getElementById('p-summary');
+    if (el) el.value = lines.join('\n');
 }
 
 // ============================================================
