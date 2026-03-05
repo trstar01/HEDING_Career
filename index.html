@@ -418,36 +418,73 @@
   </section>
 
   <!-- ============================
-     Section 6: 헤드헌터 선택
+     Section 6: 전문분야 선택
      ============================ -->
   <section id="headhunters" class="hunters-section">
     <div class="container">
       <div class="section-header">
-        <span class="section-label">헤드헌터 선택</span>
-        <h2 class="section-title">원하는 헤드헌터를 선택하세요</h2>
-        <p class="section-subtitle">1지망~3지망까지 선택하거나 '무관'을 선택하면 자동 매칭됩니다</p>
+        <span class="section-label">전문분야 선택</span>
+        <h2 class="section-title">헤드헌터의 전문분야를 선택하세요</h2>
+        <p class="section-subtitle">원하는 헤드헌터를 고르는 방식이 아니라, 헤드헌터의 전문분야(산업군)를 선택해 주세요.<br>
+          특정 헤드헌터를 원하면, 아래 링크에서 소속 헤드헌터를 확인한 뒤 이름을 입력할 수 있습니다.</p>
+        <!-- 헤드헌터 목록 링크 -->
+        <a href="https://heding.co.kr/headhunter" target="_blank" rel="noopener noreferrer"
+          class="btn btn-sm btn-secondary hunter-list-link">
+          헤드헌터 목록 보기 화살표문자
+        </a>
       </div>
 
-      <div class="hunter-controls">
-        <button id="btn-no-preference" class="btn btn-secondary" onclick="toggleNoPreference()">헤드헌터 무관</button>
+      <!-- 전문분야(=산업군) 2단계 선택 -->
+      <div class="specialty-card">
+        <h3 class="specialty-card-title">필요한 전문분야를 선택하세요 <span class="required-mark">*</span></h3>
+        <div class="industry-row">
+          <select id="s-industry-main" class="form-input" onchange="syncSpecialty()">
+            <option value="">대분류 선택 *</option>
+            <option>IT</option>
+            <option>반도체/디스플레이</option>
+            <option>2차전지</option>
+            <option>자동차/모빌리티</option>
+            <option>제조/엔지니어링</option>
+            <option>화학/에너지</option>
+            <option>건설/플랜트</option>
+            <option>부동산</option>
+            <option>금융</option>
+            <option>바이오/제약/의료</option>
+            <option>소비재(FMCG)</option>
+            <option>유통/커머스</option>
+            <option>마케팅/PR/경영지원</option>
+            <option>기타</option>
+          </select>
+          <input type="text" id="s-industry-sub" class="form-input" placeholder="중분류 (예: 소프트웨어, 영업, 재무 등)"
+            oninput="syncSpecialty()">
+        </div>
+        <p class="specialty-hint">선택하신 산업군은 콘설팅 신청 양식에 자동 반영됩니다.</p>
       </div>
 
-      <!-- 산업 필터 칩 (JS renderFilterChips()로 렌더링) -->
-      <div id="hunter-filter-chips" class="hunter-filter-chips"></div>
-
-      <div class="grid grid-3 mt-lg" id="headhunter-list">
-        <!-- JS로 렌더링 -->
-        <div class="hunter-loading">헤드헌터 정보를 불러오는 중...</div>
+      <!-- 소속 헤드헌터 지정(선택) -->
+      <div class="specialty-card mt-lg">
+        <h3 class="specialty-card-title">소속 헤드헌터 지정 <span class="badge-optional">선택</span></h3>
+        <div class="radio-group">
+          <label class="radio-label">
+            <input type="radio" name="s-hunter-yn" value="지정하지 않음" checked onchange="syncHunterYn()">
+            지정하지 않음 (자동 매칭)
+          </label>
+          <label class="radio-label">
+            <input type="radio" name="s-hunter-yn" value="이름을 알고 있어요" onchange="syncHunterYn()">
+            이름을 알고 있어요
+          </label>
+        </div>
+        <div id="s-hunter-input-wrap" style="display:none; margin-top:8px;">
+          <input type="text" id="s-hunter-name" class="form-input"
+            placeholder="예: 홍길동 (팀/직급을 알면 함께). 정확한 성명이 아니면 '지정하지 않음' 권장" oninput="syncSpecialty()">
+        </div>
+        <span class="form-hint warn-typo" style="display:block; margin-top:8px;">⚠️ 정확한 성명을 모르시면 '지정하지 않음'을 선택해 주세요. 오타가
+          있으면 매칭이 지연될 수 있습니다.</span>
       </div>
 
-      <!-- 더보기/접기 버튼 -->
-      <div class="hunter-more-wrap">
-        <button id="hunter-more-btn" class="btn btn-secondary" onclick="toggleExpand()"
-          style="display:none">더보기</button>
-      </div>
-
-      <div id="hunter-summary" class="hunter-summary hidden">
-        <strong>선택 현황:</strong> <span id="hunter-summary-text"></span>
+      <!-- 콘설팅 CTA -->
+      <div style="text-align:center; margin-top:32px;">
+        <button class="btn btn-primary btn-lg" onclick="openConsultingModal()">전문분야 선정 후 콘설팅 신청하기</button>
       </div>
     </div>
   </section>
@@ -700,19 +737,18 @@
         </div>
         <!-- 희망 헤드헌터 -->
         <div class="form-group">
-          <label class="form-label">희망 헤드헌터</label>
+          <label class="form-label">소속 헤드헌터 지정</label>
           <div class="radio-group">
-            <label class="radio-label"><input type="radio" name="c-hunter-yn" value="없음" checked
-                onchange="toggleHunterInput('consulting')"> 없음 (자동 매칭)</label>
-            <label class="radio-label"><input type="radio" name="c-hunter-yn" value="있음"
-                onchange="toggleHunterInput('consulting')"> 있음 (직접 입력)</label>
+            <label class="radio-label"><input type="radio" name="c-hunter-yn" value="지정하지 않음" checked
+                onchange="toggleHunterInput('consulting')"> 지정하지 않음 (자동 매칭)</label>
+            <label class="radio-label"><input type="radio" name="c-hunter-yn" value="이름을 알고 있어요"
+                onchange="toggleHunterInput('consulting')"> 이름을 알고 있어요</label>
           </div>
           <div id="c-hunter-input-wrap" style="display:none; margin-top:8px;">
             <input type="text" id="c-hunter-name" class="form-input"
-              placeholder="예: 홍길동(팀/직급을 알면 함께). 정확한 성명이 아니면 '없음' 권장">
+              placeholder="예: 홍길동 (팀/직급을 알면 함께). 정확한 성명이 아니면 '지정하지 않음' 권장">
           </div>
-          <span class="form-hint hunter-warn">화면에서 선택하신 헤드헌터 정보는 위 요약에 자동 반영됩니다.</span>
-          <span class="form-hint hunter-warn warn-typo">⚠️ 정확한 성명을 모르시면 '없음'을 선택해 주세요. 오타가 있으면 매칭이 지연될 수 있습니다.</span>
+          <span class="form-hint warn-typo">⚠️ 정확한 성명을 모르시면 '지정하지 않음'을 선택해 주세요. 오타가 있으면 매칭이 지연될 수 있습니다.</span>
         </div>
         <!-- 개인정보 동의 -->
         <div class="form-group">

@@ -1410,3 +1410,39 @@ section {
   padding: 4px 8px;
   margin-top: 6px;
 }
+
+/* ---- 전문분야 선택 카드 ---- */
+.specialty-card {
+  background: var(--bg-mid);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius-md);
+  padding: 28px 32px;
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+.specialty-card-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 14px;
+}
+
+.specialty-hint {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-top: 10px;
+}
+
+/* ---- 헤드헌터 목록 보기 링크 ---- */
+.hunter-list-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 12px;
+  font-size: 14px;
+}
+
+.mt-lg {
+  margin-top: 20px;
+}
