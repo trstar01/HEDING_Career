@@ -4,11 +4,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="HEDING 커리어 컨설팅 - 18년 경력의 130+ 헤드헌터가 제공하는 실행형 커리어 조언. 이력서 첨삭, 면접 코칭, 헤드헌터 멘토링">
-  <title>HEDING 커리어 컨설팅 - 실전 커리어 전략, 헤드헌터와 함께</title>
+  <meta name="description" content="헤딩써치 커리어 컨설팅 - 18년 헤드헌팅 경험, 120+ 헤드헌터가 제공하는 실행형 커리어 조언. 이력서 첨삭, 면접 코칭, 헤드헌터 멘토링">
+  <meta name="theme-color" content="#0a0c09">
+  <title>헤딩써치 커리어 컨설팅 - 실전 커리어 전략, 헤드헌터와 함께</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
   <link rel="stylesheet" href="styles.css">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
 </head>
@@ -20,10 +22,14 @@
      ============================ -->
   <header class="site-header">
     <div class="header-inner">
-      <a href="https://heding.co.kr" target="_blank" rel="noopener noreferrer" class="logo-link">
-        <img src="https://cdn.imweb.me/thumbnail/20240314/beab70c98724e.png" alt="HEDING 로고" class="logo-img">
+      <a href="https://hedings.co.kr/" class="logo-link" aria-label="헤딩써치 홈페이지로 이동">
+        <img src="logo-hedingsearch-lime.png" alt="헤딩써치 HEDING SEARCH" class="logo-img">
+        <span class="logo-sub">CAREER</span>
       </a>
-      <a href="#apply" class="btn btn-primary btn-sm">지금 신청하기</a>
+      <nav class="header-nav">
+        <a href="https://hedings.co.kr/" class="home-link"><span aria-hidden="true">←</span> 헤딩써치 홈</a>
+        <a href="#apply" class="btn btn-accent btn-sm">지금 신청하기 <span aria-hidden="true">↗</span></a>
+      </nav>
     </div>
   </header>
 
@@ -32,15 +38,15 @@
      ============================ -->
   <section class="hero">
     <div class="container">
-      <div class="hero-badge">18년 경력 · 130+ 헤드헌터 네트워크</div>
-      <h1 class="hero-title">커리어의 다음 단계,<br>헤드헌터와 함께 설계하세요</h1>
+      <div class="hero-badge">HEDING SEARCH · CAREER CONSULTING</div>
+      <h1 class="hero-title">커리어의 다음 단계,<br><span class="hl">헤드헌터와 함께 설계하세요.</span></h1>
       <p class="hero-subtitle">
         추상적인 조언이 아닌, 시장에서 바로 통하는 실행형 피드백.<br>
         이직 · 이력서 · 면접 · 멘토링까지 한 곳에서.
       </p>
       <div class="hero-cta">
-        <button class="btn btn-white btn-lg" onclick="openConsultingModal()">컨설팅 신청하기</button>
-        <a href="#services" class="btn btn-outline-white btn-lg">서비스 살펴보기</a>
+        <button class="btn btn-primary btn-lg" onclick="openConsultingModal()">컨설팅 신청하기 <span aria-hidden="true">↗</span></button>
+        <a href="#services" class="btn btn-secondary btn-lg">서비스 살펴보기 <span aria-hidden="true">→</span></a>
       </div>
     </div>
   </section>
@@ -53,10 +59,10 @@
       <div class="stats-grid">
         <div class="stat-item">
           <span class="stat-number">18년</span>
-          <span class="stat-label">업계 경력</span>
+          <span class="stat-label">헤드헌팅 현장 경험</span>
         </div>
         <div class="stat-item">
-          <span class="stat-number">130+</span>
+          <span class="stat-number">120+</span>
           <span class="stat-label">헤드헌터 네트워크</span>
         </div>
         <div class="stat-item">
@@ -124,7 +130,7 @@
             <h4>이직 진단</h4>
             <p class="price-desc">현재 위치 분석 + 방향 제시</p>
           </div>
-          <div class="price-amount">39,000<span>원</span></div>
+          <div class="price-amount">49,000<span>원</span></div>
           <ul class="price-features">
             <li>커리어 현황 분석</li>
             <li>시장 포지셔닝 평가</li>
@@ -139,7 +145,7 @@
             <h4>이력서 첨삭</h4>
             <p class="price-desc">서류 통과율을 높이는 전략</p>
           </div>
-          <div class="price-amount">59,000<span>원</span></div>
+          <div class="price-amount">69,000<span>원</span></div>
           <ul class="price-features">
             <li>라인별 상세 피드백</li>
             <li>ATS 최적화 조언</li>
@@ -154,7 +160,7 @@
             <h4>면접 코칭</h4>
             <p class="price-desc">합격 확률을 높이는 실전 연습</p>
           </div>
-          <div class="price-amount">59,000<span>원</span></div>
+          <div class="price-amount">69,000<span>원</span></div>
           <ul class="price-features">
             <li>예상 질문 & 답변 전략</li>
             <li>모의 면접 (10분)</li>
@@ -169,7 +175,7 @@
             <h4>현직자 멘토링</h4>
             <p class="price-desc">실무자가 알려주는 인사이트</p>
           </div>
-          <div class="price-amount">49,000<span>원</span></div>
+          <div class="price-amount">59,000<span>원</span></div>
           <ul class="price-features">
             <li>목표 직무 현직자 매칭</li>
             <li>실무 관점 조언</li>
@@ -184,7 +190,7 @@
             <h4>헤드헌터 멘토링</h4>
             <p class="price-desc">인재 시장 전문가의 조언</p>
           </div>
-          <div class="price-amount">49,000<span>원</span></div>
+          <div class="price-amount">59,000<span>원</span></div>
           <ul class="price-features">
             <li>헤드헌터 직접 매칭</li>
             <li>시장 트렌드 분석</li>
@@ -203,8 +209,8 @@
             <h4>Basic</h4>
             <p class="price-desc">진단 + 이력서</p>
           </div>
-          <div class="price-amount">89,000<span>원</span></div>
-          <p class="price-original">정가 98,000원</p>
+          <div class="price-amount">99,000<span>원</span></div>
+          <p class="price-original">정가 118,000원</p>
           <ul class="price-features">
             <li>이직 진단</li>
             <li>이력서 첨삭</li>
@@ -218,8 +224,8 @@
             <h4>Standard</h4>
             <p class="price-desc">이력서 + 면접</p>
           </div>
-          <div class="price-amount">99,000<span>원</span></div>
-          <p class="price-original">정가 118,000원</p>
+          <div class="price-amount">109,000<span>원</span></div>
+          <p class="price-original">정가 138,000원</p>
           <ul class="price-features">
             <li>이력서 첨삭</li>
             <li>면접 코칭</li>
@@ -232,8 +238,8 @@
             <h4>Premium</h4>
             <p class="price-desc">진단 + 이력서 + 면접</p>
           </div>
-          <div class="price-amount">139,000<span>원</span></div>
-          <p class="price-original">정가 157,000원</p>
+          <div class="price-amount">149,000<span>원</span></div>
+          <p class="price-original">정가 187,000원</p>
           <ul class="price-features">
             <li>이직 진단</li>
             <li>이력서 첨삭</li>
@@ -629,7 +635,7 @@
     <div class="container">
       <div class="footer-inner">
         <div class="footer-brand">
-          <p class="footer-brand-name">HEDING</p>
+          <a href="https://hedings.co.kr/" aria-label="헤딩써치 홈페이지로 이동"><img src="logo-hedingsearch-lime.png" alt="헤딩써치" class="footer-logo"></a>
           <p>실전 커리어 전략, 헤드헌터와 함께</p>
         </div>
         <div class="footer-links">
@@ -644,6 +650,7 @@
           <div class="footer-col">
             <h5>바로가기</h5>
             <ul>
+              <li><a href="https://hedings.co.kr/">헤딩써치 홈페이지 ↗</a></li>
               <li><a href="#services">서비스 & 가격</a></li>
               <li><a href="#headhunters">헤드헌터 선택</a></li>
               <li><a href="#coach-apply">코치 지원</a></li>
@@ -653,7 +660,7 @@
         </div>
       </div>
       <div class="footer-bottom">
-        <p>&copy; 2026 HEDING. All rights reserved.</p>
+        <p>&copy; 2026 HEDING SEARCH. All rights reserved.</p>
       </div>
     </div>
   </footer>
@@ -691,11 +698,11 @@
         <div class="form-group">
           <label class="form-label required">신청 서비스 (복수 선택)</label>
           <div class="checkbox-group">
-            <label class="check-label"><input type="checkbox" name="c-services" value="진단"> 이직 진단 (39,000원)</label>
-            <label class="check-label"><input type="checkbox" name="c-services" value="이력서"> 이력서 첨삭 (59,000원)</label>
-            <label class="check-label"><input type="checkbox" name="c-services" value="면접"> 면접 코칭 (59,000원)</label>
-            <label class="check-label"><input type="checkbox" name="c-services" value="현직자"> 현직자 멘토링 (49,000원)</label>
-            <label class="check-label"><input type="checkbox" name="c-services" value="헤드헌터"> 헤드헌터 멘토링 (49,000원)</label>
+            <label class="check-label"><input type="checkbox" name="c-services" value="진단"> 이직 진단 (49,000원)</label>
+            <label class="check-label"><input type="checkbox" name="c-services" value="이력서"> 이력서 첨삭 (69,000원)</label>
+            <label class="check-label"><input type="checkbox" name="c-services" value="면접"> 면접 코칭 (69,000원)</label>
+            <label class="check-label"><input type="checkbox" name="c-services" value="현직자"> 현직자 멘토링 (59,000원)</label>
+            <label class="check-label"><input type="checkbox" name="c-services" value="헤드헌터"> 헤드헌터 멘토링 (59,000원)</label>
           </div>
           <span class="form-error" id="err-c-services"></span>
         </div>
@@ -704,11 +711,11 @@
           <label class="form-label">또는 패키지 선택</label>
           <div class="radio-group">
             <label class="radio-label"><input type="radio" name="c-package" value="Basic"> Basic - 진단+이력서
-              (89,000원)</label>
-            <label class="radio-label"><input type="radio" name="c-package" value="Standard"> Standard - 이력서+면접
               (99,000원)</label>
+            <label class="radio-label"><input type="radio" name="c-package" value="Standard"> Standard - 이력서+면접
+              (109,000원)</label>
             <label class="radio-label"><input type="radio" name="c-package" value="Premium"> Premium - 진단+이력서+면접
-              (139,000원)</label>
+              (149,000원)</label>
           </div>
         </div>
         <!-- 산업군 (필수) -->
@@ -890,9 +897,10 @@
     </div>
   </div>
 
-  <a id="heding-floating-logo" href="https://heding.co.kr" target="_blank" rel="noopener noreferrer"
-    aria-label="HEDING">
-    <img src="https://cdn.imweb.me/thumbnail/20240314/beab70c98724e.png" alt="HEDING" />
+  <a id="heding-floating-logo" href="https://hedings.co.kr/" aria-label="헤딩써치 홈페이지로 이동">
+    <span class="fl-home" aria-hidden="true">⌂</span>
+    <img src="logo-hedingsearch-lime.png" alt="" />
+    <span class="fl-text">홈</span>
   </a>
 
   <script src="script.js"></script>
