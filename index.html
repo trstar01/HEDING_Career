@@ -53,6 +53,12 @@
      Section 1: Hero
      ============================ -->
   <section class="hero">
+    <svg class="hero-arcs" viewBox="0 0 800 800" aria-hidden="true" focusable="false">
+      <circle cx="400" cy="400" r="390" />
+      <circle cx="400" cy="400" r="300" />
+      <circle cx="400" cy="400" r="210" />
+      <circle cx="400" cy="400" r="120" />
+    </svg>
     <div class="container">
       <div class="hero-grid">
       <div class="hero-main">
@@ -142,90 +148,11 @@
       <div class="section-header">
         <span class="section-label">02 / PRICING</span>
         <h2 class="section-title">필요한 것만 골라서</h2>
-        <p class="section-subtitle">개별 메뉴부터 패키지까지, 상황에 맞게 선택하세요</p>
-      </div>
-
-      <!-- 개별 메뉴 -->
-      <h3 class="sub-title">개별 메뉴</h3>
-      <div class="grid grid-3 mb-xl">
-        <div class="price-card">
-          <div class="price-card-header">
-            <h4>이직 진단</h4>
-            <p class="price-desc">현재 위치 분석 + 방향 제시</p>
-          </div>
-          <div class="price-amount">49,000<span>원</span></div>
-          <ul class="price-features">
-            <li>커리어 현황 분석</li>
-            <li>시장 포지셔닝 평가</li>
-            <li>이직 타이밍 조언</li>
-            <li>액션 플랜 제공</li>
-          </ul>
-          <button class="btn btn-primary btn-block" onclick="openConsultingModal('진단')">신청하기</button>
-        </div>
-
-        <div class="price-card">
-          <div class="price-card-header">
-            <h4>이력서 첨삭</h4>
-            <p class="price-desc">서류 통과율을 높이는 전략</p>
-          </div>
-          <div class="price-amount">69,000<span>원</span></div>
-          <ul class="price-features">
-            <li>라인별 상세 피드백</li>
-            <li>ATS 최적화 조언</li>
-            <li>산업별 맞춤 표현</li>
-            <li>Before/After 비교</li>
-          </ul>
-          <button class="btn btn-primary btn-block" onclick="openConsultingModal('이력서')">신청하기</button>
-        </div>
-
-        <div class="price-card">
-          <div class="price-card-header">
-            <h4>면접 코칭</h4>
-            <p class="price-desc">합격 확률을 높이는 실전 연습</p>
-          </div>
-          <div class="price-amount">69,000<span>원</span></div>
-          <ul class="price-features">
-            <li>예상 질문 & 답변 전략</li>
-            <li>모의 면접 (10분)</li>
-            <li>답변 스크립트 피드백</li>
-            <li>인터뷰 체크리스트</li>
-          </ul>
-          <button class="btn btn-primary btn-block" onclick="openConsultingModal('면접')">신청하기</button>
-        </div>
-
-        <div class="price-card">
-          <div class="price-card-header">
-            <h4>현직자 멘토링</h4>
-            <p class="price-desc">실무자가 알려주는 인사이트</p>
-          </div>
-          <div class="price-amount">59,000<span>원</span></div>
-          <ul class="price-features">
-            <li>목표 직무 현직자 매칭</li>
-            <li>실무 관점 조언</li>
-            <li>업무 환경 & 문화</li>
-            <li>전환 팁 & 준비사항</li>
-          </ul>
-          <button class="btn btn-primary btn-block" onclick="openConsultingModal('현직자')">신청하기</button>
-        </div>
-
-        <div class="price-card">
-          <div class="price-card-header">
-            <h4>헤드헌터 멘토링</h4>
-            <p class="price-desc">인재 시장 전문가의 조언</p>
-          </div>
-          <div class="price-amount">59,000<span>원</span></div>
-          <ul class="price-features">
-            <li>헤드헌터 직접 매칭</li>
-            <li>시장 트렌드 분석</li>
-            <li>포지션별 채용 인사이트</li>
-            <li>네트워킹 전략</li>
-          </ul>
-          <button class="btn btn-primary btn-block" onclick="openConsultingModal('헤드헌터')">신청하기</button>
-        </div>
+        <p class="section-subtitle">패키지로 묶어 할인받거나, 필요한 메뉴만 따로 신청하세요</p>
       </div>
 
       <!-- 패키지 -->
-      <h3 class="sub-title">패키지 <span class="badge-discount">할인가</span></h3>
+      <h3 class="sub-title">패키지 <span class="badge-discount">할인가</span><span class="sub-note">함께 신청하면 최대 38,000원 할인</span></h3>
       <div class="grid grid-3 mb-xl">
         <div class="price-card">
           <div class="price-card-header">
@@ -272,33 +199,63 @@
         </div>
       </div>
 
+      <!-- 개별 메뉴 -->
+      <h3 class="sub-title">개별 메뉴</h3>
+      <div class="menu-list mb-xl">
+        <div class="menu-row">
+          <div class="menu-info">
+            <h4>이직 진단</h4>
+            <p class="menu-desc">현재 위치 분석 + 방향 제시</p>
+            <p class="menu-feats">커리어 현황 분석 · 시장 포지셔닝 평가 · 이직 타이밍 조언 · 액션 플랜 제공</p>
+          </div>
+          <div class="menu-price">49,000<span>원</span></div>
+          <button type="button" class="btn btn-secondary btn-sm" onclick="openConsultingModal('진단')">신청</button>
+        </div>
+        <div class="menu-row">
+          <div class="menu-info">
+            <h4>이력서 첨삭</h4>
+            <p class="menu-desc">서류 통과율을 높이는 전략</p>
+            <p class="menu-feats">라인별 상세 피드백 · ATS 최적화 조언 · 산업별 맞춤 표현 · Before/After 비교</p>
+          </div>
+          <div class="menu-price">69,000<span>원</span></div>
+          <button type="button" class="btn btn-secondary btn-sm" onclick="openConsultingModal('이력서')">신청</button>
+        </div>
+        <div class="menu-row">
+          <div class="menu-info">
+            <h4>면접 코칭</h4>
+            <p class="menu-desc">합격 확률을 높이는 실전 연습</p>
+            <p class="menu-feats">예상 질문 & 답변 전략 · 모의 면접 (10분) · 답변 스크립트 피드백 · 인터뷰 체크리스트</p>
+          </div>
+          <div class="menu-price">69,000<span>원</span></div>
+          <button type="button" class="btn btn-secondary btn-sm" onclick="openConsultingModal('면접')">신청</button>
+        </div>
+        <div class="menu-row">
+          <div class="menu-info">
+            <h4>현직자 멘토링</h4>
+            <p class="menu-desc">실무자가 알려주는 인사이트</p>
+            <p class="menu-feats">목표 직무 현직자 매칭 · 실무 관점 조언 · 업무 환경 & 문화 · 전환 팁 & 준비사항</p>
+          </div>
+          <div class="menu-price">59,000<span>원</span></div>
+          <button type="button" class="btn btn-secondary btn-sm" onclick="openConsultingModal('현직자')">신청</button>
+        </div>
+        <div class="menu-row">
+          <div class="menu-info">
+            <h4>헤드헌터 멘토링</h4>
+            <p class="menu-desc">인재 시장 전문가의 조언</p>
+            <p class="menu-feats">헤드헌터 직접 매칭 · 시장 트렌드 분석 · 포지션별 채용 인사이트 · 네트워킹 전략</p>
+          </div>
+          <div class="menu-price">59,000<span>원</span></div>
+          <button type="button" class="btn btn-secondary btn-sm" onclick="openConsultingModal('헤드헌터')">신청</button>
+        </div>
+      </div>
+
       <!-- 추가 옵션 -->
       <h3 class="sub-title">추가 옵션</h3>
-      <div class="grid grid-2">
-        <div class="option-card">
-          <div>
-            <strong>급행 처리 (24시간)</strong>
-            <span class="option-price">+10,000원</span>
-          </div>
-        </div>
-        <div class="option-card">
-          <div>
-            <strong>문서 추가 1개</strong>
-            <span class="option-price">+20,000원</span>
-          </div>
-        </div>
-        <div class="option-card">
-          <div>
-            <strong>추가 수정 반영 1회</strong>
-            <span class="option-price">+30,000원</span>
-          </div>
-        </div>
-        <div class="option-card">
-          <div>
-            <strong>통화 10분 추가</strong>
-            <span class="option-price">+20,000원</span>
-          </div>
-        </div>
+      <div class="option-list">
+        <div class="option-row"><span>급행 처리 (24시간)</span><strong>+10,000원</strong></div>
+        <div class="option-row"><span>문서 추가 1개</span><strong>+20,000원</strong></div>
+        <div class="option-row"><span>추가 수정 반영 1회</span><strong>+30,000원</strong></div>
+        <div class="option-row"><span>통화 10분 추가</span><strong>+20,000원</strong></div>
       </div>
     </div>
   </section>
@@ -312,6 +269,13 @@
         <span class="section-label">03 / PROCESS</span>
         <h2 class="section-title">어떻게 진행되나요?</h2>
       </div>
+      <ol class="flow">
+        <li><span class="flow-num">01</span><strong>신청서 제출</strong><span>커리어 현황과 목표, 고민을 남겨 주세요</span></li>
+        <li><span class="flow-num">02</span><strong>헤드헌터 매칭</strong><span>24~48시간 내 분야 헤드헌터를 연결합니다</span></li>
+        <li><span class="flow-num">03</span><strong>분석 · 통화</strong><span>문서 분석과 10분 화상·음성 통화</span></li>
+        <li><span class="flow-num">04</span><strong>실행 리포트</strong><span>1~2장 PDF 액션 플랜을 전달합니다</span></li>
+      </ol>
+      <h3 class="flow-sub">서비스별 상세 진행</h3>
       <div class="accordion" id="processAccordion">
         <div class="accordion-item">
           <button class="accordion-header">
@@ -450,9 +414,9 @@
     <div class="container">
       <div class="section-header">
         <span class="section-label">04 / HEADHUNTER</span>
-        <h2 class="section-title">헤드헌터의 전문분야를 선택하세요</h2>
-        <p class="section-subtitle">원하는 헤드헌터를 고르는 방식이 아니라, 헤드헌터의 전문분야(산업군)를 선택해 주세요.<br>
-          특정 헤드헌터를 원하면, 아래 링크에서 소속 헤드헌터를 확인한 뒤 이름을 입력할 수 있습니다.</p>
+        <h2 class="section-title">분야별 전문 헤드헌터가 직접 맡습니다</h2>
+        <p class="section-subtitle">산업군을 고르면 해당 분야 헤드헌터와 매칭됩니다.<br>
+          특정 헤드헌터를 원하면 소속 헤드헌터를 확인한 뒤 신청서에 이름을 지정할 수 있습니다.</p>
         <!-- 헤드헌터 목록 링크 -->
         <a href="https://heding.co.kr/headhunter" target="_blank" rel="noopener noreferrer"
           class="btn btn-sm btn-secondary hunter-list-link">
@@ -460,58 +424,22 @@
         </a>
       </div>
 
-      <!-- 전문분야(=산업군) 2단계 선택 -->
-      <div class="specialty-card">
-        <h3 class="specialty-card-title">필요한 전문분야를 선택하세요 <span class="required-mark">*</span></h3>
-        <div class="industry-row">
-          <select id="s-industry-main" class="form-input" onchange="syncSpecialty()">
-            <option value="">대분류 선택 *</option>
-            <option>IT</option>
-            <option>반도체/디스플레이</option>
-            <option>2차전지</option>
-            <option>자동차/모빌리티</option>
-            <option>제조/엔지니어링</option>
-            <option>화학/에너지</option>
-            <option>건설/플랜트</option>
-            <option>부동산</option>
-            <option>금융</option>
-            <option>바이오/제약/의료</option>
-            <option>소비재(FMCG)</option>
-            <option>유통/커머스</option>
-            <option>마케팅/PR/경영지원</option>
-            <option>기타</option>
-          </select>
-          <input type="text" id="s-industry-sub" class="form-input" placeholder="중분류 (예: 소프트웨어, 영업, 재무 등)"
-            oninput="syncSpecialty()">
-        </div>
-        <p class="specialty-hint">선택하신 산업군은 컨설팅 신청 양식에 자동 반영됩니다.</p>
+      <div class="ind-grid">
+        <button type="button" class="ind-chip" onclick="openConsultingWithIndustry('IT')">IT<span aria-hidden="true">↗</span></button>
+        <button type="button" class="ind-chip" onclick="openConsultingWithIndustry('반도체/디스플레이')">반도체/디스플레이<span aria-hidden="true">↗</span></button>
+        <button type="button" class="ind-chip" onclick="openConsultingWithIndustry('2차전지')">2차전지<span aria-hidden="true">↗</span></button>
+        <button type="button" class="ind-chip" onclick="openConsultingWithIndustry('자동차/모빌리티')">자동차/모빌리티<span aria-hidden="true">↗</span></button>
+        <button type="button" class="ind-chip" onclick="openConsultingWithIndustry('제조/엔지니어링')">제조/엔지니어링<span aria-hidden="true">↗</span></button>
+        <button type="button" class="ind-chip" onclick="openConsultingWithIndustry('화학/에너지')">화학/에너지<span aria-hidden="true">↗</span></button>
+        <button type="button" class="ind-chip" onclick="openConsultingWithIndustry('건설/플랜트')">건설/플랜트<span aria-hidden="true">↗</span></button>
+        <button type="button" class="ind-chip" onclick="openConsultingWithIndustry('부동산')">부동산<span aria-hidden="true">↗</span></button>
+        <button type="button" class="ind-chip" onclick="openConsultingWithIndustry('금융')">금융<span aria-hidden="true">↗</span></button>
+        <button type="button" class="ind-chip" onclick="openConsultingWithIndustry('바이오/제약/의료')">바이오/제약/의료<span aria-hidden="true">↗</span></button>
+        <button type="button" class="ind-chip" onclick="openConsultingWithIndustry('소비재(FMCG)')">소비재(FMCG)<span aria-hidden="true">↗</span></button>
+        <button type="button" class="ind-chip" onclick="openConsultingWithIndustry('유통/커머스')">유통/커머스<span aria-hidden="true">↗</span></button>
+        <button type="button" class="ind-chip" onclick="openConsultingWithIndustry('마케팅/PR/경영지원')">마케팅/PR/경영지원<span aria-hidden="true">↗</span></button>
       </div>
-
-      <!-- 소속 헤드헌터 지정(선택) -->
-      <div class="specialty-card mt-lg">
-        <h3 class="specialty-card-title">소속 헤드헌터 지정 <span class="badge-optional">선택</span></h3>
-        <div class="radio-group">
-          <label class="radio-label">
-            <input type="radio" name="s-hunter-yn" value="지정하지 않음" checked onchange="syncHunterYn()">
-            지정하지 않음 (자동 매칭)
-          </label>
-          <label class="radio-label">
-            <input type="radio" name="s-hunter-yn" value="이름을 알고 있어요" onchange="syncHunterYn()">
-            이름을 알고 있어요
-          </label>
-        </div>
-        <div id="s-hunter-input-wrap" style="display:none; margin-top:8px;">
-          <input type="text" id="s-hunter-name" class="form-input"
-            placeholder="예: 홍길동 (팀/직급을 알면 함께). 정확한 성명이 아니면 '지정하지 않음' 권장" oninput="syncSpecialty()">
-        </div>
-        <span class="form-hint warn-typo" style="display:block; margin-top:8px;">정확한 성명을 모르시면 '지정하지 않음'을 선택해 주세요. 오타가
-          있으면 매칭이 지연될 수 있습니다.</span>
-      </div>
-
-      <!-- 콘설팅 CTA -->
-      <div style="text-align:center; margin-top:32px;">
-        <button class="btn btn-primary btn-lg" onclick="openConsultingModal()">컨설팅 신청하기</button>
-      </div>
+      <p class="ind-hint">분야를 누르면 신청서에 자동으로 입력됩니다. 목록에 없는 분야는 신청서에서 '기타'를 선택해 주세요.</p>
     </div>
   </section>
 

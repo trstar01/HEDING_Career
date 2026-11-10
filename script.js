@@ -443,3 +443,31 @@ document.addEventListener("DOMContentLoaded", () => {
     initLiveUpdates();
     initSmoothScroll();
 });
+
+// ============================================================
+// 산업군 바로 선택 → 신청서 자동 입력 (2026.11 고도화)
+// ============================================================
+function openConsultingWithIndustry(industry) {
+    openConsultingModal();
+    const sel = document.getElementById('c-industry-main');
+    if (sel) {
+        const opt = [...sel.options].find(o => o.value === industry || o.text === industry);
+        if (opt) sel.value = opt.value;
+        sel.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+    if (typeof updateConsultingSummary === 'function') updateConsultingSummary();
+}
+
+// 스크롤 등장 효과
+(function initReveal() {
+    if (!('IntersectionObserver' in window)) return;
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const targets = document.querySelectorAll('.section-header, .price-card, .common-card, .benefit-card, .menu-row, .flow li, .ind-chip, .stat-item, .apply-box');
+    targets.forEach(el => el.classList.add('reveal'));
+    const io = new IntersectionObserver(entries => {
+        entries.forEach(e => {
+            if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+        });
+    }, { rootMargin: '0px 0px -8% 0px', threshold: 0.08 });
+    targets.forEach(el => io.observe(el));
+})();
