@@ -38,8 +38,12 @@
      ============================ -->
   <section class="hero">
     <div class="container">
+      <div class="hero-grid">
+      <div class="hero-main">
       <div class="hero-badge">HEDING SEARCH · CAREER CONSULTING</div>
       <h1 class="hero-title">커리어의 다음 단계,<br><span class="hl">헤드헌터와 함께 설계하세요.</span></h1>
+      </div>
+      <div class="hero-side">
       <p class="hero-subtitle">
         추상적인 조언이 아닌, 시장에서 바로 통하는 실행형 피드백.<br>
         이직 · 이력서 · 면접 · 멘토링까지 한 곳에서.
@@ -47,6 +51,8 @@
       <div class="hero-cta">
         <button class="btn btn-primary btn-lg" onclick="openConsultingModal()">컨설팅 신청하기 <span aria-hidden="true">↗</span></button>
         <a href="#services" class="btn btn-secondary btn-lg">서비스 살펴보기 <span aria-hidden="true">→</span></a>
+      </div>
+      </div>
       </div>
     </div>
   </section>
@@ -83,27 +89,27 @@
   <section class="common-section">
     <div class="container">
       <div class="section-header">
-        <span class="section-label">모든 서비스 공통</span>
+        <span class="section-label">01 / INCLUDED</span>
         <h2 class="section-title">어떤 메뉴든 기본 포함</h2>
       </div>
       <div class="grid grid-4">
         <div class="common-card">
-          <div class="common-icon">📞</div>
+          <div class="common-icon">01</div>
           <h4>10분 통화</h4>
           <p>화상·음성 통화로 핵심을 직접 파악</p>
         </div>
         <div class="common-card">
-          <div class="common-icon">📝</div>
+          <div class="common-icon">02</div>
           <h4>문서 피드백</h4>
           <p>라인별 상세 코멘트 및 개선 방향 제시</p>
         </div>
         <div class="common-card">
-          <div class="common-icon">📊</div>
+          <div class="common-icon">03</div>
           <h4>실행 리포트</h4>
           <p>1~2장 PDF 액션 플랜 리포트 제공</p>
         </div>
         <div class="common-card">
-          <div class="common-icon">⚡</div>
+          <div class="common-icon">04</div>
           <h4>24~48h 회신</h4>
           <p>빠른 매칭으로 골든타임 놓치지 않음</p>
         </div>
@@ -117,7 +123,7 @@
   <section id="services" class="services-section">
     <div class="container">
       <div class="section-header">
-        <span class="section-label">서비스 & 가격</span>
+        <span class="section-label">02 / PRICING</span>
         <h2 class="section-title">필요한 것만 골라서</h2>
         <p class="section-subtitle">개별 메뉴부터 패키지까지, 상황에 맞게 선택하세요</p>
       </div>
@@ -253,28 +259,24 @@
       <h3 class="sub-title">추가 옵션</h3>
       <div class="grid grid-2">
         <div class="option-card">
-          <span class="option-icon">⚡</span>
           <div>
             <strong>급행 처리 (24시간)</strong>
             <span class="option-price">+10,000원</span>
           </div>
         </div>
         <div class="option-card">
-          <span class="option-icon">📄</span>
           <div>
             <strong>문서 추가 1개</strong>
             <span class="option-price">+20,000원</span>
           </div>
         </div>
         <div class="option-card">
-          <span class="option-icon">🔄</span>
           <div>
             <strong>추가 수정 반영 1회</strong>
             <span class="option-price">+30,000원</span>
           </div>
         </div>
         <div class="option-card">
-          <span class="option-icon">📞</span>
           <div>
             <strong>통화 10분 추가</strong>
             <span class="option-price">+20,000원</span>
@@ -290,7 +292,7 @@
   <section class="process-section">
     <div class="container">
       <div class="section-header">
-        <span class="section-label">프로세스 & 샘플</span>
+        <span class="section-label">03 / PROCESS</span>
         <h2 class="section-title">어떻게 진행되나요?</h2>
       </div>
       <div class="accordion" id="processAccordion">
@@ -430,7 +432,7 @@
   <section id="headhunters" class="hunters-section">
     <div class="container">
       <div class="section-header">
-        <span class="section-label">전문분야 선택</span>
+        <span class="section-label">04 / HEADHUNTER</span>
         <h2 class="section-title">헤드헌터의 전문분야를 선택하세요</h2>
         <p class="section-subtitle">원하는 헤드헌터를 고르는 방식이 아니라, 헤드헌터의 전문분야(산업군)를 선택해 주세요.<br>
           특정 헤드헌터를 원하면, 아래 링크에서 소속 헤드헌터를 확인한 뒤 이름을 입력할 수 있습니다.</p>
@@ -465,7 +467,7 @@
           <input type="text" id="s-industry-sub" class="form-input" placeholder="중분류 (예: 소프트웨어, 영업, 재무 등)"
             oninput="syncSpecialty()">
         </div>
-        <p class="specialty-hint">선택하신 산업군은 콘설팅 신청 양식에 자동 반영됩니다.</p>
+        <p class="specialty-hint">선택하신 산업군은 컨설팅 신청 양식에 자동 반영됩니다.</p>
       </div>
 
       <!-- 소속 헤드헌터 지정(선택) -->
@@ -485,7 +487,7 @@
           <input type="text" id="s-hunter-name" class="form-input"
             placeholder="예: 홍길동 (팀/직급을 알면 함께). 정확한 성명이 아니면 '지정하지 않음' 권장" oninput="syncSpecialty()">
         </div>
-        <span class="form-hint warn-typo" style="display:block; margin-top:8px;">⚠️ 정확한 성명을 모르시면 '지정하지 않음'을 선택해 주세요. 오타가
+        <span class="form-hint warn-typo" style="display:block; margin-top:8px;">정확한 성명을 모르시면 '지정하지 않음'을 선택해 주세요. 오타가
           있으면 매칭이 지연될 수 있습니다.</span>
       </div>
 
@@ -508,7 +510,7 @@
           <button class="btn btn-primary btn-lg" onclick="openConsultingModal()">컨설팅 신청하기</button>
         </div>
         <div class="payment-info">
-          <span class="payment-badge">💳</span> 결제는 매칭 확정 후 계좌이체로 진행됩니다
+          결제는 매칭 확정 후 계좌이체로 진행됩니다
         </div>
       </div>
     </div>
@@ -520,7 +522,7 @@
   <section class="payment-section">
     <div class="container">
       <div class="section-header">
-        <span class="section-label">결제 안내</span>
+        <span class="section-label">05 / PAYMENT</span>
         <h2 class="section-title">매칭 확정 후 계좌이체</h2>
       </div>
       <div class="payment-steps">
@@ -535,7 +537,7 @@
         <div class="step"><span class="step-num">5</span><span>리포트 전달</span></div>
       </div>
       <div class="alert alert-warning mt-lg">
-        ⚠️ <strong>환불 정책:</strong> 서비스 시작 전 100% 환불 가능. 시작 후에는 진행 단계에 따라 부분 환불.
+        <strong>환불 정책</strong> 서비스 시작 전 100% 환불 가능. 시작 후에는 진행 단계에 따라 부분 환불.
       </div>
     </div>
   </section>
@@ -546,28 +548,28 @@
   <section id="coach-apply" class="coach-section">
     <div class="container">
       <div class="section-header">
-        <span class="section-label">현직자 코치 모집</span>
+        <span class="section-label">06 / COACH</span>
         <h2 class="section-title">세컨잡으로 커리어 코칭에 참여하세요</h2>
         <p class="section-subtitle">당신의 경험이 누군가의 커리어에 큰 도움이 됩니다</p>
       </div>
       <div class="coach-benefits grid grid-2 mb-xl">
         <div class="benefit-card">
-          <div class="benefit-icon">🗓️</div>
+          <div class="benefit-icon">01</div>
           <h4>유연한 스케줄</h4>
           <p>본업에 지장 없이 주 1~2회, 회당 10분 코칭</p>
         </div>
         <div class="benefit-card">
-          <div class="benefit-icon">💰</div>
+          <div class="benefit-icon">02</div>
           <h4>합리적인 보상</h4>
           <p>회당 보상 지급, 활동량에 따라 유연하게 조정</p>
         </div>
         <div class="benefit-card">
-          <div class="benefit-icon">🤝</div>
+          <div class="benefit-icon">03</div>
           <h4>네트워킹</h4>
           <p>다양한 업계 현직자 및 헤드헌터와 교류</p>
         </div>
         <div class="benefit-card">
-          <div class="benefit-icon">📈</div>
+          <div class="benefit-icon">04</div>
           <h4>개인 브랜딩</h4>
           <p>커리어 코칭 경험 축적 및 개인 브랜드 강화</p>
         </div>
@@ -584,7 +586,7 @@
   <section id="faq" class="faq-section">
     <div class="container">
       <div class="section-header">
-        <span class="section-label">FAQ</span>
+        <span class="section-label">07 / FAQ</span>
         <h2 class="section-title">자주 묻는 질문</h2>
       </div>
       <div class="accordion" id="faqAccordion">
@@ -642,7 +644,7 @@
           <div class="footer-col">
             <h5>문의</h5>
             <ul>
-              <li><a href="mailto:heding@heding.co.kr">heding@heding.co.kr</a></li>
+              <li><a href="mailto:hr@hedings.co.kr">hr@hedings.co.kr</a></li>
               <li>카카오톡: 헤딩</li>
               <li>운영시간: 평일 9~18시</li>
             </ul>
@@ -756,7 +758,7 @@
             <input type="text" id="c-hunter-name" class="form-input"
               placeholder="예: 홍길동 (팀/직급을 알면 함께). 정확한 성명이 아니면 '지정하지 않음' 권장">
           </div>
-          <span class="form-hint warn-typo">⚠️ 정확한 성명을 모르시면 '지정하지 않음'을 선택해 주세요. 오타가 있으면 매칭이 지연될 수 있습니다.</span>
+          <span class="form-hint warn-typo">정확한 성명을 모르시면 '지정하지 않음'을 선택해 주세요. 오타가 있으면 매칭이 지연될 수 있습니다.</span>
         </div>
         <!-- 개인정보 동의 -->
         <div class="form-group">
@@ -897,11 +899,6 @@
     </div>
   </div>
 
-  <a id="heding-floating-logo" href="https://hedings.co.kr/" aria-label="헤딩써치 홈페이지로 이동">
-    <span class="fl-home" aria-hidden="true">⌂</span>
-    <img src="logo-hedingsearch-lime.png" alt="" />
-    <span class="fl-text">홈</span>
-  </a>
 
   <script src="script.js"></script>
 </body>
