@@ -1609,3 +1609,19 @@ body { word-break: keep-all; }
 .specialty-card { margin-left: 0; margin-right: 0; max-width: none; background: #fff; border: 1px solid var(--line); border-radius: 12px; }
 .warn-typo { background: transparent !important; color: var(--muted) !important; padding: 0 !important; }
 .badge-optional { background: none; border: 1px solid var(--line); color: var(--muted); }
+/* 플로팅 홈 버튼 v2: 스크롤 후 등장, 작고 단정하게 */
+#heding-floating-logo {
+  position: fixed; left: 20px; bottom: 20px; z-index: 900;
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 9px 14px; border-radius: 999px;
+  background: var(--ink); border: 1px solid rgba(255,255,255,.08);
+  box-shadow: 0 6px 20px rgba(10,12,9,.18);
+  opacity: 0; transform: translateY(8px); pointer-events: none;
+  transition: opacity .25s ease, transform .25s ease;
+}
+#heding-floating-logo.is-visible { opacity: 1; transform: none; pointer-events: auto; }
+#heding-floating-logo:hover { transform: none; box-shadow: 0 8px 24px rgba(10,12,9,.26); }
+#heding-floating-logo img { height: 15px; width: auto; max-width: none; }
+#heding-floating-logo .fl-arrow { color: rgba(251,252,246,.6); font-size: 12px; line-height: 1; }
+#heding-floating-logo .fl-text { color: rgba(251,252,246,.85); font-size: 12px; font-weight: 600; }
+@media (max-width: 420px) { #heding-floating-logo { left: 14px; bottom: 14px; padding: 8px 12px; } }
