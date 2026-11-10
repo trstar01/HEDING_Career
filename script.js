@@ -354,12 +354,15 @@ function clearErrors(modalId) {
 // ============================================================
 function initAccordions() {
     document.querySelectorAll(".accordion-header").forEach(header => {
+        header.setAttribute("type", "button");
+        header.setAttribute("aria-expanded", "false");
         header.addEventListener("click", () => {
             const item = header.closest(".accordion-item");
             const content = item.querySelector(".accordion-content");
             const isOpen = header.classList.contains("active");
             header.classList.toggle("active", !isOpen);
             content.classList.toggle("active", !isOpen);
+            header.setAttribute("aria-expanded", String(!isOpen));
         });
     });
 }
